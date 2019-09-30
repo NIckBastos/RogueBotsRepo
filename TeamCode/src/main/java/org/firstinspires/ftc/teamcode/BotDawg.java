@@ -68,13 +68,13 @@ public class BotDawg
   public DcMotor leftBackMotor= null;
   public DcMotor rightBackMotor= null;
   public DcMotor rightFrontMotor= null;
-  public DcMotor liftMotor= null;
-  public DcMotor armMotor= null;
-  public Servo markerServo= null;
-  public DcMotor lockMotor =null;
-  public DcMotor intakeMotor =null;
-  public Servo leftLiftServo = null;
-  public Servo rightLiftServo = null;
+//  public DcMotor liftMotor= null;
+//  public DcMotor armMotor= null;
+//  public Servo markerServo= null;
+//  public DcMotor lockMotor =null;
+//  public DcMotor intakeMotor =null;
+//  public Servo leftLiftServo = null;
+//  public Servo rightLiftServo = null;
   BNO055IMU imu;
   public static final double MID_SERVO       =  0.5 ;
   public static final double ARM_UP_POWER    =  0.45 ;
@@ -97,13 +97,13 @@ public class BotDawg
     leftBackMotor = hardwareMap.dcMotor.get("backLeft");
     rightBackMotor = hardwareMap.dcMotor.get("frontRight");
     rightFrontMotor = hardwareMap.dcMotor.get("backRight");
-    liftMotor = hardwareMap.dcMotor.get("liftMotor");
-    armMotor = hardwareMap.dcMotor.get("armMotor");
-    markerServo = hardwareMap.servo.get("MarkerServo");
-    lockMotor = hardwareMap.dcMotor.get("lockMotor");
-    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-    leftLiftServo = hardwareMap.servo.get("leftLiftServo");
-    rightLiftServo = hardwareMap.servo.get("rightLiftServo");
+//    liftMotor = hardwareMap.dcMotor.get("liftMotor");
+//    armMotor = hardwareMap.dcMotor.get("armMotor");
+//    markerServo = hardwareMap.servo.get("MarkerServo");
+//    lockMotor = hardwareMap.dcMotor.get("lockMotor");
+//    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
+//    leftLiftServo = hardwareMap.servo.get("leftLiftServo");
+//    rightLiftServo = hardwareMap.servo.get("rightLiftServo");
     imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
@@ -137,14 +137,14 @@ public class BotDawg
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-    lockMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    lockMotor.setMode(RunMode.RUN_TO_POSITION);
-    armMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-    armMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-    armMotor.setMode(RunMode.RUN_TO_POSITION);
+//    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+//    lockMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+//    lockMotor.setMode(RunMode.RUN_TO_POSITION);
+//    armMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
+//    armMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+//    armMotor.setMode(RunMode.RUN_TO_POSITION);
 
 
 
