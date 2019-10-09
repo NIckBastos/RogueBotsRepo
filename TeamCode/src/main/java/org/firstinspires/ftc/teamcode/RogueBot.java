@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Servo channel:  Servo to open left claw:  "left_hand"
  * Servo channel:  Servo to open right claw: "right_hand"
  */
-public class BotDawg
+public class RogueBot
 {
   /* Public OpMode members. */
 //    public DcMotor leftFrontMotor   = null;
@@ -85,7 +85,7 @@ public class BotDawg
   private ElapsedTime period  = new ElapsedTime();
 
   /* Constructor */
-  public BotDawg(){
+  public RogueBot(){
 
   }
 

@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "MainTeleOpMode", group = "TeleOp")
 
@@ -31,12 +30,12 @@ public class MainTeleOpMode extends OpMode {
     double motorMovementMax = 0.0;
 
 
-    private BotDawg robot;
+    private RogueBot robot;
 
     @Override
     public void init() {
 
-        robot = new BotDawg();
+        robot = new RogueBot();
         robot.init(hardwareMap);
 //        robot.scoopMotor.setTargetPosition(0);
     }

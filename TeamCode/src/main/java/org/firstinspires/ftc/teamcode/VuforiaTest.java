@@ -62,9 +62,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -100,6 +101,15 @@ public class VuforiaTest extends LinearOpMode {
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = true  ;
+
+    private RogueBot robot = new RogueBot();   // Use a Pushbot's hardware
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -353,15 +363,81 @@ public class VuforiaTest extends LinearOpMode {
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-                telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
+                //telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
+                encoderStrafe(5,translation.get(1),2);
+                telemetry.addData("Movement","{X} = %.lf", translation.get(1));
             }
             else {
                 telemetry.addData("Visible Target", "none");
             }
+
+
             telemetry.update();
         }
 
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+    }
+
+    public void encoderStrafe(double speed,
+                             double strafeDistance,
+                             double timeoutS) {
+
+
+        int newLeftFrontTarget;
+        int newRightFrontTarget;
+        int newLeftBackTarget;
+        int newRightBackTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = -robot.rightFrontMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = -robot.leftBackMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
+            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
+
+            robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
+            robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
+            robot.leftBackMotor.setTargetPosition(newLeftBackTarget);
+            robot.rightBackMotor.setTargetPosition(newRightBackTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.leftFrontMotor.setPower(Math.abs(speed));
+            robot.rightFrontMotor.setPower(Math.abs(speed));
+            robot.leftBackMotor.setPower(Math.abs(speed));
+            robot.rightBackMotor.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy())) {
+
+
+            }
+            // Stop all motion;
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftBackMotor.setPower(0);
+            robot.rightBackMotor.setPower(0);
+            // Turn off RUN_TO_POSITION
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
 }

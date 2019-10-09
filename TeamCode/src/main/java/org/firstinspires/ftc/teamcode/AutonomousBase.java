@@ -29,16 +29,12 @@ package org.firstinspires.ftc.teamcode;
      * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
      */
 
-import android.content.Context;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -47,13 +43,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 //import static org.firstinspires.ftc.teamcode.RobotMovement.followCurve;
@@ -96,7 +88,7 @@ public class AutonomousBase extends LinearOpMode {
     Acceleration gravity;
 
     /* Declare OpMode members. */
-    private BotDawg robot = new BotDawg();   // Use a Pushbot's hardware
+    private RogueBot robot = new RogueBot();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
 
 
