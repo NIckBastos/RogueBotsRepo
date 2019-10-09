@@ -110,6 +110,7 @@ public class VuforiaTest extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double STRAFE_SPEED = 0.6;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -364,7 +365,7 @@ public class VuforiaTest extends LinearOpMode {
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
                 //telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
-                encoderStrafe(5,translation.get(1),2);
+                encoderStrafe(STRAFE_SPEED,translation.get(1),2);
                 telemetry.addData("Movement","{X} = %.lf", translation.get(1));
             }
             else {

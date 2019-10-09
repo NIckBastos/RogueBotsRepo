@@ -22,12 +22,13 @@ public class StrafeMethodTest extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double STRAFE_SPEED = 0.6;
 
 
 
     @Override
     public void runOpMode() {
-        encoderStrafe(5, 10, 5);
+        encoderStrafe(STRAFE_SPEED, 10, 5);
 
     }
 
