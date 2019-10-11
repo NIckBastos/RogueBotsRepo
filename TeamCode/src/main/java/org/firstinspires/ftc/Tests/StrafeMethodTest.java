@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RogueBot;
 
-@TeleOp(name = "MainTeleOpMode", group = "TeleOp")
+@TeleOp(name = "StrafeMethodTest", group = "TeleOp")
 
 public class StrafeMethodTest extends LinearOpMode {
 
