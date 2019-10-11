@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,7 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RogueBot;
 
-@TeleOp(name = "MainTeleOpMode", group = "TeleOp")
+@Autonomous(name = "StrafeMethodTest", group = "TeleOp")
+
+
 
 public class StrafeMethodTest extends LinearOpMode {
 
@@ -22,17 +25,23 @@ public class StrafeMethodTest extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double STRAFE_SPEED = 0.6;
+    static final double STRAFE_SPEED = 1.0;
+
+
+
 
 
 
     @Override
     public void runOpMode() {
-        encoderStrafe(STRAFE_SPEED, 10, 5);
-        encoderMovement(STRAFE_SPEED, 10, 90, 5);
+        robot.init(hardwareMap);
+        if(opModeIsActive()) {
+            //encoderStrafe(STRAFE_SPEED, 10, 5);
+            waitForStart();
+            encoderMovement(STRAFE_SPEED, 50, 90, 2);
+        }
 
     }
-
 
 
     public void encoderStrafe(double speed,
