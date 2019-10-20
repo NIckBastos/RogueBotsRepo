@@ -47,6 +47,8 @@ public class MainTeleOpMode extends OpMode {
     }
 
 
+
+
     public void loop() {
 
         drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
@@ -96,16 +98,21 @@ public class MainTeleOpMode extends OpMode {
 //        }
 
 
-//        //Setting the power of the intake motor to 1
-//        if(gamepad2.a){
-//            robot.intakeMotor.setPower(1);
-//        }
-//        if(gamepad2.b){
-//            robot.intakeMotor.setPower(0);
-//        }
-//        if(gamepad2.y){
-//            robot.intakeMotor.setPower(-1);
-//        }
+        //Setting the power of the intake servo to 1
+        if (gamepad2.a) {
+            robot.intakeServo_2.setPower(1);
+            robot.intakeServo_1.setPower(-1);
+        }
+        if (gamepad2.b) {
+            robot.intakeServo_1.setPower(0);
+            robot.intakeServo_2.setPower(0);
+        }
+        if (gamepad2.x) {
+            robot.intakeServo_2.setPower(-1);
+            robot.intakeServo_1.setPower(1);
+        }
+
+
 //
 //
 //        if(gamepad2.right_bumper && !gamepad2.left_bumper){
@@ -122,6 +129,11 @@ public class MainTeleOpMode extends OpMode {
         telemetry.addData("Status", "Run Time: " + runtime.toString());
 //        telemetry.addData("Motors", "left (%.2f), right (%.2f)",leftMotorPower, rightMotorPower);
         telemetry.addData("Value of joystick = ", gamepad2.right_stick_y);
+        telemetry.addData("Motor Power left back:", robot.leftBackMotor.getPower());
+        telemetry.addData("Motor Power left front:", robot.leftFrontMotor.getPower());
+        telemetry.addData("Motor Power right back:", robot.rightBackMotor.getPower());
+        telemetry.addData("Motor Power right front:", robot.rightFrontMotor.getPower());
+        telemetry.update();
 
     }
 }

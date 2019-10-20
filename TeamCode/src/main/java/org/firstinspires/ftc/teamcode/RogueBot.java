@@ -29,6 +29,7 @@ package org.firstinspires.ftc.teamcode;/* Copyright (c) 2017 FIRST. All rights r
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
@@ -68,6 +69,8 @@ public class RogueBot
   public DcMotor leftBackMotor= null;
   public DcMotor rightBackMotor= null;
   public DcMotor rightFrontMotor= null;
+  public CRServo intakeServo_1 = null;
+  public CRServo intakeServo_2 = null;
 //  public DcMotor liftMotor= null;
 //  public DcMotor armMotor= null;
 //  public Servo markerServo= null;
@@ -97,6 +100,9 @@ public class RogueBot
     leftBackMotor = hardwareMap.dcMotor.get("backLeft");
     rightBackMotor = hardwareMap.dcMotor.get("frontRight");
     rightFrontMotor = hardwareMap.dcMotor.get("backRight");
+    intakeServo_1 = hardwareMap.crservo.get("intakeServo1");
+    intakeServo_2 = hardwareMap.crservo.get("intakeServo2");
+
 //    liftMotor = hardwareMap.dcMotor.get("liftMotor");
 //    armMotor = hardwareMap.dcMotor.get("armMotor");
 //    markerServo = hardwareMap.servo.get("MarkerServo");
@@ -137,6 +143,7 @@ public class RogueBot
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 //    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,7 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.RogueBot;
 
-@TeleOp(name = "StrafeMethodTest", group = "TeleOp")
+@Autonomous(name = "StrafeMethodTest", group = "TeleOp")
+
+
 
 public class StrafeMethodTest extends LinearOpMode {
 
@@ -22,17 +25,23 @@ public class StrafeMethodTest extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double STRAFE_SPEED = 0.6;
+    static final double STRAFE_SPEED = 1.0;
+
+
+
 
 
 
     @Override
     public void runOpMode() {
-        encoderStrafe(STRAFE_SPEED, 10, 5);
-        encoderMovement(STRAFE_SPEED, 10, 90, 5);
+        robot.init(hardwareMap);
+        if(opModeIsActive()) {
+            //encoderStrafe(STRAFE_SPEED, 10, 5);
+            waitForStart();
+            //encoderMovement(STRAFE_SPEED, 50, 90, 2);
+        }
 
     }
-
 
 
     public void encoderStrafe(double speed,
@@ -98,7 +107,7 @@ public class StrafeMethodTest extends LinearOpMode {
     }
 
     public void encoderMovement(double speed,
-                              double deltaDistance, double angleHeading,
+                              double xDistance, double yDistance, double deltaDistance, double angleHeading,
                               double timeoutS) {
 
 
@@ -112,14 +121,27 @@ public class StrafeMethodTest extends LinearOpMode {
         double frontRightDistance;
         double backRightDistance;
 
+        double frontLeftPower;
+        double frontRightPower;
+        double backLeftPower;
+        double backRightPower;
+
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+            double radius = Math.sqrt((xDistance*xDistance) + (yDistance*yDistance));
 
             frontLeftDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
             backLeftDistance = (deltaDistance*Math.cos(angleHeading)) - (deltaDistance*Math.sin(angleHeading));
             frontRightDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
             backRightDistance = (deltaDistance*Math.cos(angleHeading)) - (deltaDistance*Math.sin(angleHeading));
+
+
+            //Finding the power for each motor
+            frontLeftPower = (Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
+            backLeftPower = (Math.cos(angleHeading)) - (Math.sin(angleHeading));
+            frontRightPower = (Math.cos(angleHeading)) + (Math.sin(angleHeading));
+            backRightPower = (Math.cos(angleHeading)) - (Math.sin(angleHeading));
 
 
             // Determine new target position, and pass to motor controller
@@ -166,6 +188,8 @@ public class StrafeMethodTest extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
