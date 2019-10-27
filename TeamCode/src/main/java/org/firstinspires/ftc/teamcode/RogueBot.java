@@ -71,6 +71,11 @@ public class RogueBot
   public DcMotor rightFrontMotor= null;
   public CRServo intakeServo_1 = null;
   public CRServo intakeServo_2 = null;
+  public CRServo intakeServo_3 = null;
+  public CRServo intakeServo_4 = null;
+  public Servo flipServo_1 = null;
+  public Servo flipServo_2 = null;
+
 //  public DcMotor liftMotor= null;
 //  public DcMotor armMotor= null;
 //  public Servo markerServo= null;
@@ -79,9 +84,6 @@ public class RogueBot
 //  public Servo leftLiftServo = null;
 //  public Servo rightLiftServo = null;
   BNO055IMU imu;
-  public static final double MID_SERVO       =  0.5 ;
-  public static final double ARM_UP_POWER    =  0.45 ;
-  public static final double ARM_DOWN_POWER  = -0.45 ;
 
   /* local OpMode members. */
   HardwareMap hwMap =  null;
@@ -100,8 +102,13 @@ public class RogueBot
     leftBackMotor = hardwareMap.dcMotor.get("backLeft");
     rightBackMotor = hardwareMap.dcMotor.get("frontRight");
     rightFrontMotor = hardwareMap.dcMotor.get("backRight");
+
     intakeServo_1 = hardwareMap.crservo.get("intakeServo1");
     intakeServo_2 = hardwareMap.crservo.get("intakeServo2");
+    intakeServo_3 = hardwareMap.crservo.get("intakeServo3");
+    intakeServo_4 = hardwareMap.crservo.get("intakeServo4");
+    flipServo_1 = hardwareMap.servo.get("flipServo_1");
+    flipServo_2 = hardwareMap.servo.get("flipServo2");
 
 //    liftMotor = hardwareMap.dcMotor.get("liftMotor");
 //    armMotor = hardwareMap.dcMotor.get("armMotor");

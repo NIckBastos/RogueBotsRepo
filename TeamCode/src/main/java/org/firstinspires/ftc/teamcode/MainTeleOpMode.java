@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "MainTeleOpMode", group = "TeleOp")
@@ -76,6 +77,8 @@ public class MainTeleOpMode extends OpMode {
 
         robot.leftFrontMotor.setPower(frontLeftPower);
         robot.leftBackMotor.setPower(backLeftPower);
+
+        //robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rightFrontMotor.setPower(frontRightPower);
         robot.rightBackMotor.setPower(backRightPower);
 
@@ -99,22 +102,39 @@ public class MainTeleOpMode extends OpMode {
 
 
         //Setting the power of the intake servo to 1
-        if (gamepad2.a) {
+        if (gamepad1.a) {
             robot.intakeServo_2.setPower(1);
             robot.intakeServo_1.setPower(-1);
-        }
-        if (gamepad2.b) {
-            robot.intakeServo_1.setPower(0);
-            robot.intakeServo_2.setPower(0);
-        }
-        if (gamepad2.x) {
+            robot.intakeServo_3.setPower(1);
+            robot.intakeServo_4.setPower(-1);
+        } else if (gamepad1.x) {
             robot.intakeServo_2.setPower(-1);
             robot.intakeServo_1.setPower(1);
+            robot.intakeServo_3.setPower(-1);
+            robot.intakeServo_4.setPower(1);
+        }else{
+            robot.intakeServo_1.setPower(0);
+            robot.intakeServo_2.setPower(-0.05);
+            robot.intakeServo_3.setPower(0);
+            robot.intakeServo_4.setPower(0);
+        }
+        if(gamepad2.y){
+            robot.flipServo_1.setPosition(90);
+            robot.flipServo_2.setPosition(-90);
+
+        }
+        if(gamepad2.b){
+            robot.flipServo_1.setPosition(-90);
+            robot.flipServo_2.setPosition(90);
+        }
+        if(gamepad2.a){
+            robot.flipServo_1.setPosition(0);
+            robot.flipServo_2.setPosition(0);
         }
 
 
-//
-//
+
+
 //        if(gamepad2.right_bumper && !gamepad2.left_bumper){
 //            robot.lockMotor.setPower(1);
 //            robot.lockMotor.setTargetPosition(-10);
@@ -133,6 +153,8 @@ public class MainTeleOpMode extends OpMode {
         telemetry.addData("Motor Power left front:", robot.leftFrontMotor.getPower());
         telemetry.addData("Motor Power right back:", robot.rightBackMotor.getPower());
         telemetry.addData("Motor Power right front:", robot.rightFrontMotor.getPower());
+        telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());
+        telemetry.addData("Servo 2 position", robot.flipServo_2.getPosition());
         telemetry.update();
 
     }

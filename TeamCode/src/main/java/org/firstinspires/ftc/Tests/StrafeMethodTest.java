@@ -38,7 +38,7 @@ public class StrafeMethodTest extends LinearOpMode {
         if(opModeIsActive()) {
             //encoderStrafe(STRAFE_SPEED, 10, 5);
             waitForStart();
-            //encoderMovement(STRAFE_SPEED, 50, 90, 2);
+            encoderMovement(STRAFE_SPEED, 50, 90, 2);
         }
 
     }
@@ -106,8 +106,7 @@ public class StrafeMethodTest extends LinearOpMode {
         }
     }
 
-    public void encoderMovement(double speed,
-                              double xDistance, double yDistance, double deltaDistance, double angleHeading,
+    public void encoderMovement(double speed, double deltaDistance, double angleHeading,
                               double timeoutS) {
 
 
@@ -129,8 +128,8 @@ public class StrafeMethodTest extends LinearOpMode {
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-            double radius = Math.sqrt((xDistance*xDistance) + (yDistance*yDistance));
-
+            //double radius = Math.sqrt((xDistance*xDistance) + (yDistance*yDistance));
+            
             frontLeftDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
             backLeftDistance = (deltaDistance*Math.cos(angleHeading)) - (deltaDistance*Math.sin(angleHeading));
             frontRightDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
