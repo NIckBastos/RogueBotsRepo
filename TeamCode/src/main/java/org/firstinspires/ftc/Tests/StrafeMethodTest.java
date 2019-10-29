@@ -106,41 +106,53 @@ public class StrafeMethodTest extends LinearOpMode {
         }
     }
 
-    public void encoderMovement(double speed, double deltaDistance, double angleHeading,
+    public void encoderMovement(double speed, double distance, double angleHeading,
                               double timeoutS) {
 
+        angleHeading = Math.toRadians(angleHeading);
 
         int newLeftFrontTarget;
         int newRightFrontTarget;
         int newLeftBackTarget;
         int newRightBackTarget;
 
-        double frontLeftDistance;
-        double backLeftDistance;
-        double frontRightDistance;
-        double backRightDistance;
+        double frontLeftDistance = 0;
+        double backLeftDistance = 0;
+        double frontRightDistance = 0;
+        double backRightDistance = 0;
 
         double frontLeftPower;
         double frontRightPower;
         double backLeftPower;
         double backRightPower;
 
+        double xDist;
+        double yDist;
+
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-            //double radius = Math.sqrt((xDistance*xDistance) + (yDistance*yDistance));
-            
-            frontLeftDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
-            backLeftDistance = (deltaDistance*Math.cos(angleHeading)) - (deltaDistance*Math.sin(angleHeading));
-            frontRightDistance = (deltaDistance*Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
-            backRightDistance = (deltaDistance*Math.cos(angleHeading)) - (deltaDistance*Math.sin(angleHeading));
+            xDist = distance*Math.cos(angleHeading);
+            yDist = distance*Math.sin(angleHeading);
 
+            if(yDist>= xDist){
 
-            //Finding the power for each motor
-            frontLeftPower = (Math.cos(angleHeading)) + (deltaDistance*Math.sin(angleHeading));
-            backLeftPower = (Math.cos(angleHeading)) - (Math.sin(angleHeading));
-            frontRightPower = (Math.cos(angleHeading)) + (Math.sin(angleHeading));
-            backRightPower = (Math.cos(angleHeading)) - (Math.sin(angleHeading));
+                frontLeftDistance = Math.sqrt(yDist*yDist + xDist*xDist);
+                frontRightDistance = Math.sqrt(yDist*yDist - xDist*xDist);
+                backLeftDistance = Math.sqrt(yDist*yDist - xDist*xDist);
+                backRightDistance = Math.sqrt(yDist*yDist + xDist*xDist);
+            }else if(xDist> yDist){
+
+                frontLeftDistance = Math.sqrt(xDist*xDist + yDist*yDist);
+                frontRightDistance = Math.sqrt(xDist*xDist - yDist*yDist) * -1;
+                backLeftDistance = Math.sqrt(xDist*xDist - yDist*yDist) * -1;
+                backRightDistance = Math.sqrt(xDist*xDist + yDist*yDist);
+            }
+
+            frontLeftPower = (frontLeftDistance/distance);
+            frontRightPower = (frontRightDistance/distance);
+            backLeftPower = (backLeftDistance/distance);
+            backRightPower = (backRightDistance/distance);
 
 
             // Determine new target position, and pass to motor controller
@@ -160,12 +172,18 @@ public class StrafeMethodTest extends LinearOpMode {
             robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+
+
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftFrontMotor.setPower(Math.abs(speed));
-            robot.rightFrontMotor.setPower(Math.abs(speed));
-            robot.leftBackMotor.setPower(Math.abs(speed));
-            robot.rightBackMotor.setPower(Math.abs(speed));
+            robot.leftFrontMotor.setPower(Math.abs(frontLeftPower));
+            robot.rightFrontMotor.setPower(Math.abs(frontRightPower));
+            robot.leftBackMotor.setPower(Math.abs(backLeftPower));
+            robot.rightBackMotor.setPower(Math.abs(backRightPower));
+
+
+
+
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits

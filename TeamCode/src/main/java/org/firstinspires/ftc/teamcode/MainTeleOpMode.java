@@ -16,6 +16,8 @@ public class MainTeleOpMode extends OpMode {
     double drive;   // Power for forward and back motion
     double strafe;  // Power for left and right motion
     double rotate;  // Power for rotating the robot
+    double startingAngle =0;
+    double currentAngle = 0;
 
     final private static double JOYSTICK_DEADBAND = 0.1;
 
@@ -52,40 +54,32 @@ public class MainTeleOpMode extends OpMode {
 
     public void loop() {
 
+        //Finding the value of each joystick
         drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
 
-//        //Assigning gamepad values
-//        leftJoyStick = -gamepad1.left_stick_y;
-//        rightJoyStick = -gamepad1.right_stick_x;
-//
-//        motorMovementMin = -0.85;
-//        motorMovementMax = 0.85;
-//
-//        if (Math.abs(leftJoyStick) < JOYSTICK_DEADBAND) leftJoyStick = 0;
-//        if (Math.abs(rightJoyStick) < JOYSTICK_DEADBAND) rightJoyStick = 0;
-//
-//        //Assiging POV drive values
-//
-//        leftMotorPower = Range.clip(leftJoyStick + rightJoyStick, motorMovementMin, motorMovementMax);
-//        rightMotorPower = Range.clip(leftJoyStick - rightJoyStick, motorMovementMin, motorMovementMax);
+
+        // Joystick Deadband
+        if (Math.abs(drive) < JOYSTICK_DEADBAND) drive = 0;
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND) strafe = 0;
+
+
+        //Finding the power to assign for each motor
         frontLeftPower = drive + strafe + rotate;
         backLeftPower = drive - strafe + rotate;
         frontRightPower = drive + strafe - rotate;
         backRightPower = drive - strafe - rotate;
 
+        // Setting the power to each motor
         robot.leftFrontMotor.setPower(frontLeftPower);
         robot.leftBackMotor.setPower(backLeftPower);
-
-        //robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.rightFrontMotor.setPower(frontRightPower);
         robot.rightBackMotor.setPower(backRightPower);
 
 
-        // Setting the power of the lift motor to the y value of the gamepad1 right joystick
 
-        //robot.liftMotor.setPower(gamepad2.right_stick_y);
+
 
 
 //        // If dpad in gampepad1 is pressed turn the arm
@@ -101,58 +95,56 @@ public class MainTeleOpMode extends OpMode {
 //        }
 
 
-        //Setting the power of the intake servo to 1
-        if (gamepad1.a) {
+        //Setting the power of the intake servo to 1 // Intake
+        if (gamepad2.right_bumper) {
             robot.intakeServo_2.setPower(1);
             robot.intakeServo_1.setPower(-1);
             robot.intakeServo_3.setPower(1);
             robot.intakeServo_4.setPower(-1);
-        } else if (gamepad1.x) {
+        } else if (gamepad2.left_bumper) { // Setting the power of the intake servo to -1 // Output
             robot.intakeServo_2.setPower(-1);
             robot.intakeServo_1.setPower(1);
             robot.intakeServo_3.setPower(-1);
             robot.intakeServo_4.setPower(1);
-        }else{
+        }else{ // Setting the power of the intake servo to 0 // Zero behaviour
             robot.intakeServo_1.setPower(0);
             robot.intakeServo_2.setPower(-0.05);
             robot.intakeServo_3.setPower(0);
             robot.intakeServo_4.setPower(0);
         }
+
+
         if(gamepad2.y){
-            robot.flipServo_1.setPosition(90);
-            robot.flipServo_2.setPosition(-90);
+            currentAngle+=5;
+            robot.flipServo_1.setPosition(currentAngle);
+            robot.flipServo_2.setPosition(-currentAngle);
 
+        } else if(gamepad2.b){
+            currentAngle-=5;
+            robot.flipServo_1.setPosition(-currentAngle);
+            robot.flipServo_2.setPosition(currentAngle);
+            
+        } else if(gamepad2.a){
+            robot.flipServo_1.setPosition(startingAngle);
+            robot.flipServo_2.setPosition(startingAngle);
         }
-        if(gamepad2.b){
-            robot.flipServo_1.setPosition(-90);
-            robot.flipServo_2.setPosition(90);
-        }
-        if(gamepad2.a){
-            robot.flipServo_1.setPosition(0);
-            robot.flipServo_2.setPosition(0);
-        }
 
 
 
 
-//        if(gamepad2.right_bumper && !gamepad2.left_bumper){
-//            robot.lockMotor.setPower(1);
-//            robot.lockMotor.setTargetPosition(-10);
-//
-//        }else if(!gamepad2.right_bumper && gamepad2.left_bumper){
-//            robot.lockMotor.setPower(-1);
-//            robot.lockMotor.setTargetPosition(10);
-//        }
+
+
 
         //Telemetry is not used to control the robot, it is purely to help debug by showing
         //Information on the phone
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-//        telemetry.addData("Motors", "left (%.2f), right (%.2f)",leftMotorPower, rightMotorPower);
-        telemetry.addData("Value of joystick = ", gamepad2.right_stick_y);
-        telemetry.addData("Motor Power left back:", robot.leftBackMotor.getPower());
-        telemetry.addData("Motor Power left front:", robot.leftFrontMotor.getPower());
-        telemetry.addData("Motor Power right back:", robot.rightBackMotor.getPower());
-        telemetry.addData("Motor Power right front:", robot.rightFrontMotor.getPower());
+        telemetry.addData("Value of joystick = ", "Drive (%.2f), Strafe (%.2f)", gamepad2.right_stick_y, gamepad2.right_stick_x);
+
+        // Display all motor power
+        telemetry.addData("Motor Power ", "FL (%.2f), FR (%.2f)", robot.leftFrontMotor.getPower() , robot.rightFrontMotor.getPower());
+        telemetry.addData("Motor Power ", "BL (%.2f), BR (%.2f)" , robot.leftBackMotor.getPower(), robot.leftBackMotor.getPower());
+
+        // Display flip servo position
         telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());
         telemetry.addData("Servo 2 position", robot.flipServo_2.getPosition());
         telemetry.update();
