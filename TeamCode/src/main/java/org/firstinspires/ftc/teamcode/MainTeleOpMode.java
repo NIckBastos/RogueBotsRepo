@@ -101,6 +101,7 @@ public class MainTeleOpMode extends OpMode {
             robot.intakeServo_1.setPower(-1);
             robot.intakeServo_3.setPower(1);
             robot.intakeServo_4.setPower(-1);
+
         } else if (gamepad2.left_bumper) { // Setting the power of the intake servo to -1 // Output
             robot.intakeServo_2.setPower(-1);
             robot.intakeServo_1.setPower(1);
@@ -123,7 +124,7 @@ public class MainTeleOpMode extends OpMode {
             currentAngle-=5;
             robot.flipServo_1.setPosition(-currentAngle);
             robot.flipServo_2.setPosition(currentAngle);
-            
+
         } else if(gamepad2.a){
             robot.flipServo_1.setPosition(startingAngle);
             robot.flipServo_2.setPosition(startingAngle);
@@ -143,6 +144,8 @@ public class MainTeleOpMode extends OpMode {
         // Display all motor power
         telemetry.addData("Motor Power ", "FL (%.2f), FR (%.2f)", robot.leftFrontMotor.getPower() , robot.rightFrontMotor.getPower());
         telemetry.addData("Motor Power ", "BL (%.2f), BR (%.2f)" , robot.leftBackMotor.getPower(), robot.leftBackMotor.getPower());
+
+
 
         // Display flip servo position
         telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());

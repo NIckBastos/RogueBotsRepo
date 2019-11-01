@@ -77,6 +77,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
@@ -365,7 +367,8 @@ public class VuforiaTest extends LinearOpMode {
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
                 //telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
-                encoderStrafe(5,translation.get(1),2);
+
+                encoderMovement(translation.get(1),rotation.thirdAngle,2);
                 telemetry.addData("Movement","{X} = %.lf", translation.get(1));
             }
             else {
@@ -380,24 +383,77 @@ public class VuforiaTest extends LinearOpMode {
         targetsSkyStone.deactivate();
     }
 
-    public void encoderStrafe(double speed,
-                             double strafeDistance,
-                             double timeoutS) {
+    public void encoderMovement(double distance, double angleHeading,
+                                double timeoutS) {
 
+        double angleHeadingDegrees = angleHeading;
+        angleHeading = Math.toRadians(angleHeading);
 
         int newLeftFrontTarget;
         int newRightFrontTarget;
         int newLeftBackTarget;
         int newRightBackTarget;
 
+        double frontLeftDistance = 0;
+        double backLeftDistance = 0;
+        double frontRightDistance = 0;
+        double backRightDistance = 0;
+
+        double frontLeftPower;
+        double frontRightPower;
+        double backLeftPower;
+        double backRightPower;
+
+        double xDist;
+        double yDist;
+
+        DecimalFormat rounding = new DecimalFormat("#.###");
+        rounding.setRoundingMode(RoundingMode.CEILING);
+
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
+
+
+            xDist = distance*Math.cos(angleHeading);
+            yDist = distance*Math.sin(angleHeading);
+
+            if(Math.abs(yDist)>= Math.abs(xDist)){
+                if(angleHeadingDegrees >90){
+                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                }else if(angleHeading>180){
+                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                }else {
+
+                    frontLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    frontRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    backLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    backRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                }
+            }else if(Math.abs(xDist)> Math.abs(yDist)){
+                frontLeftDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
+                frontRightDistance = Math.sqrt(xDist*xDist - yDist*yDist);
+                backLeftDistance = Math.sqrt(xDist*xDist - yDist*yDist);
+                backRightDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
+            }
+
+            frontLeftPower = Double.parseDouble(rounding.format((frontLeftDistance / distance)));
+            frontRightPower = Double.parseDouble(rounding.format((frontRightDistance/distance)));
+            backLeftPower = Double.parseDouble(rounding.format((backLeftDistance/distance)));
+            backRightPower = Double.parseDouble(rounding.format((backRightDistance/distance)));
+
+
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
-            newRightFrontTarget = -robot.rightFrontMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
-            newLeftBackTarget = -robot.leftBackMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
-            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int)(strafeDistance * COUNTS_PER_INCH);
+            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int)(frontLeftDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = robot.rightFrontMotor.getCurrentPosition() + (int)(frontRightDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = robot.leftBackMotor.getCurrentPosition() + (int)(backLeftDistance * COUNTS_PER_INCH);
+            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int)(backRightDistance * COUNTS_PER_INCH);
 
             robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
@@ -410,12 +466,18 @@ public class VuforiaTest extends LinearOpMode {
             robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+
+
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftFrontMotor.setPower(Math.abs(speed));
-            robot.rightFrontMotor.setPower(Math.abs(speed));
-            robot.leftBackMotor.setPower(Math.abs(speed));
-            robot.rightBackMotor.setPower(Math.abs(speed));
+            robot.leftFrontMotor.setPower(Math.abs(frontLeftPower));
+            robot.rightFrontMotor.setPower(Math.abs(frontRightPower));
+            robot.leftBackMotor.setPower(Math.abs(backLeftPower));
+            robot.rightBackMotor.setPower(Math.abs(backRightPower));
+
+
+
+
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -425,7 +487,7 @@ public class VuforiaTest extends LinearOpMode {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (robot.leftFrontMotor.isBusy() && robot.rightFrontMotor.isBusy())) {
+                    (robot.leftFrontMotor.isBusy() || robot.rightFrontMotor.isBusy() || robot.leftBackMotor.isBusy() || robot.rightBackMotor.isBusy())) {
 
 
             }
@@ -437,6 +499,8 @@ public class VuforiaTest extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }

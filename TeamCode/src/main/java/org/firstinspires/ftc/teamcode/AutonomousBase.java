@@ -209,43 +209,7 @@ public class AutonomousBase extends LinearOpMode {
         }
     }
 
-    public void encoderLift(double speed,
-                            double yInches,
-                            double timeoutS) {
-        int newYTarget;
 
-
-        // Ensure that the opmode is still active
-        if (opModeIsActive()) {
-
-            // Determine new target position, and pass to motor controller
-            //newYTarget = robot.liftMotor.getCurrentPosition() + (int)(yInches * COUNTS_PER_INCH);
-
-
-            //robot.liftMotor.setTargetPosition(newYTarget);
-
-            // Turn On RUN_TO_POSITION
-            //robot.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-
-            // reset the timeout time and start motion.
-            runtime.reset();
-            //robot.liftMotor.setPower(Math.abs(speed));
-
-
-//            while (opModeIsActive() &&
-//                    (runtime.seconds() < timeoutS) &&
-//                    (robot.liftMotor.isBusy())) {
-//
-//            }
-            // Stop all motion;
-           // robot.liftMotor.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            //robot.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        }
-    }
 
     public void turn(float degrees) {
         
