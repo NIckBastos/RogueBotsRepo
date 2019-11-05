@@ -89,7 +89,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-
+import com.qualcomm.robotcore.util.RobotLog;
 
 
 @Autonomous(name="SKYSTONE Test", group ="Concept")
@@ -155,6 +155,11 @@ public class VuforiaTest extends LinearOpMode {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
+    int leftFrontCurrentPosition = 0;
+    int rightFrontCurrentPositon = 0;
+    int leftBackCurrentPosition = 0;
+    int rightBackCurrentPosition = 0;
+
 
     @Override public void runOpMode() {
         /*
@@ -162,6 +167,8 @@ public class VuforiaTest extends LinearOpMode {
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
          * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
          */
+
+        robot.init(hardwareMap);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
@@ -360,16 +367,15 @@ public class VuforiaTest extends LinearOpMode {
             if (targetVisible) {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
-                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-
+//                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+//                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+//                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
                 //telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
 
-                encoderMovement(translation.get(1),rotation.thirdAngle,2);
-                telemetry.addData("Movement","{X} = %.lf", translation.get(1));
+                encoderMovement(10,0,10);
+//                telemetry.addData("Movement","{X} = %.lf", translation.get(1));
             }
             else {
                 telemetry.addData("Visible Target", "none");
@@ -407,6 +413,7 @@ public class VuforiaTest extends LinearOpMode {
         double xDist;
         double yDist;
 
+
         DecimalFormat rounding = new DecimalFormat("#.###");
         rounding.setRoundingMode(RoundingMode.CEILING);
 
@@ -431,29 +438,37 @@ public class VuforiaTest extends LinearOpMode {
                     backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
                 }else {
 
-                    frontLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    frontLeftDistance = Math.sqrt((yDist * yDist) + (xDist * xDist));
                     frontRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
                     backLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
                     backRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
                 }
             }else if(Math.abs(xDist)> Math.abs(yDist)){
-                frontLeftDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
-                frontRightDistance = Math.sqrt(xDist*xDist - yDist*yDist);
-                backLeftDistance = Math.sqrt(xDist*xDist - yDist*yDist);
-                backRightDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
+                if(angleHeadingDegrees > 90){
+                    frontLeftDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
+                    frontRightDistance = Math.sqrt(xDist*xDist - yDist*yDist);
+                    backLeftDistance = Math.sqrt(xDist*xDist - yDist*yDist);
+                    backRightDistance = Math.sqrt(xDist*xDist + yDist*yDist)*-1;
+                }else if (angleHeadingDegrees < 90){
+                    frontLeftDistance = Math.sqrt(xDist*xDist + yDist*yDist);
+                    frontRightDistance = Math.sqrt(xDist*xDist - yDist*yDist)*-1;
+                    backLeftDistance = Math.sqrt(xDist*xDist - yDist*yDist)*-1;
+                    backRightDistance = Math.sqrt(xDist*xDist + yDist*yDist);
+                }
+
             }
 
-            frontLeftPower = Double.parseDouble(rounding.format((frontLeftDistance / distance)));
+            frontLeftPower = Double.parseDouble(rounding.format((frontLeftDistance/ distance)));
             frontRightPower = Double.parseDouble(rounding.format((frontRightDistance/distance)));
             backLeftPower = Double.parseDouble(rounding.format((backLeftDistance/distance)));
             backRightPower = Double.parseDouble(rounding.format((backRightDistance/distance)));
 
 
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int)(frontLeftDistance * COUNTS_PER_INCH);
-            newRightFrontTarget = robot.rightFrontMotor.getCurrentPosition() + (int)(frontRightDistance * COUNTS_PER_INCH);
-            newLeftBackTarget = robot.leftBackMotor.getCurrentPosition() + (int)(backLeftDistance * COUNTS_PER_INCH);
-            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int)(backRightDistance * COUNTS_PER_INCH);
+            newLeftFrontTarget = leftFrontCurrentPosition +(int)(backRightDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = rightFrontCurrentPositon + (int)(frontRightDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = leftBackCurrentPosition +(int)(backLeftDistance * COUNTS_PER_INCH);
+            newRightBackTarget = rightBackCurrentPosition + (int)(backRightDistance * COUNTS_PER_INCH);
 
             robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
@@ -470,7 +485,7 @@ public class VuforiaTest extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftFrontMotor.setPower(Math.abs(frontLeftPower));
+            robot.leftFrontMotor.setPower(Math.abs(backLeftPower));
             robot.rightFrontMotor.setPower(Math.abs(frontRightPower));
             robot.leftBackMotor.setPower(Math.abs(backLeftPower));
             robot.rightBackMotor.setPower(Math.abs(backRightPower));
@@ -485,12 +500,21 @@ public class VuforiaTest extends LinearOpMode {
             // always end the motion as soon as possible.
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (robot.leftFrontMotor.isBusy() || robot.rightFrontMotor.isBusy() || robot.leftBackMotor.isBusy() || robot.rightBackMotor.isBusy())) {
-
-
+            while (opModeIsActive() &&(robot.leftFrontMotor.isBusy() || robot.rightFrontMotor.isBusy() || robot.leftBackMotor.isBusy() || robot.rightBackMotor.isBusy())) {
+                telemetry.addData("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower() , robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+                telemetry.addData("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)" , robot.leftBackMotor.getPower() , robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+                telemetry.addData("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)" , newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
+                RobotLog.d("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower(), robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+                RobotLog.d("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)" , robot.leftBackMotor.getPower() , robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+                RobotLog.d("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)" , newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
+                telemetry.update();
             }
+
+            leftFrontCurrentPosition = newLeftFrontTarget;
+            leftBackCurrentPosition = newLeftBackTarget;
+            rightBackCurrentPosition = newRightBackTarget;
+            rightFrontCurrentPositon = newRightFrontTarget;
+
             // Stop all motion;
             robot.leftFrontMotor.setPower(0);
             robot.rightFrontMotor.setPower(0);
@@ -501,8 +525,12 @@ public class VuforiaTest extends LinearOpMode {
             robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            //  sleep(250);   // optional pause after each move
+            telemetry.addData("Power of left front", "FLP (%.2f", robot.leftFrontMotor.getPower());
+            telemetry.addData("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower() , robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+            telemetry.addData("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)" , robot.leftBackMotor.getPower() , robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+            telemetry.addData("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)" , newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
+            telemetry.update();
+            sleep(5000);   // optional pause after each move
         }
     }
 }

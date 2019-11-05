@@ -16,7 +16,7 @@ public class MainTeleOpMode extends OpMode {
     double drive;   // Power for forward and back motion
     double strafe;  // Power for left and right motion
     double rotate;  // Power for rotating the robot
-    double startingAngle =0;
+    double startingAngle = 0;
     double currentAngle = 0;
 
     final private static double JOYSTICK_DEADBAND = 0.1;
@@ -116,18 +116,20 @@ public class MainTeleOpMode extends OpMode {
 
 
         if(gamepad2.y){
-            currentAngle+=5;
+            currentAngle = currentAngle + 0.1;
             robot.flipServo_1.setPosition(currentAngle);
             robot.flipServo_2.setPosition(-currentAngle);
+//            robot.flipServo_1.setPosition(0.5);
+//            robot.flipServo_1.setPosition(-0.5);
 
         } else if(gamepad2.b){
-            currentAngle-=5;
+            currentAngle = currentAngle - 0.1;
             robot.flipServo_1.setPosition(-currentAngle);
             robot.flipServo_2.setPosition(currentAngle);
 
         } else if(gamepad2.a){
-            robot.flipServo_1.setPosition(startingAngle);
-            robot.flipServo_2.setPosition(startingAngle);
+            robot.flipServo_1.setPosition(0.5);
+            robot.flipServo_2.setPosition(0.5);
         }
 
 
@@ -150,6 +152,8 @@ public class MainTeleOpMode extends OpMode {
         // Display flip servo position
         telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());
         telemetry.addData("Servo 2 position", robot.flipServo_2.getPosition());
+        telemetry.addData("Front left motor current position", robot.leftFrontMotor.getCurrentPosition());
+        telemetry.addData("Front right motor current position", robot.rightFrontMotor.getCurrentPosition());
         telemetry.update();
 
     }

@@ -100,8 +100,8 @@ public class RogueBot
     //Assigning variables
     leftFrontMotor = hardwareMap.dcMotor.get("frontLeft");
     leftBackMotor = hardwareMap.dcMotor.get("backLeft");
-    rightBackMotor = hardwareMap.dcMotor.get("frontRight");
-    rightFrontMotor = hardwareMap.dcMotor.get("backRight");
+    rightBackMotor = hardwareMap.dcMotor.get("backRight");
+    rightFrontMotor = hardwareMap.dcMotor.get("frontRight");
 
     intakeServo_1 = hardwareMap.crservo.get("intakeServo1");
     intakeServo_2 = hardwareMap.crservo.get("intakeServo2");
