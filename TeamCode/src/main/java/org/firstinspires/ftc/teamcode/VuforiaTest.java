@@ -365,6 +365,7 @@ public class VuforiaTest extends LinearOpMode {
 
             // Provide feedback as to where the robot is located (if we know).
             if (targetVisible) {
+
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
 //                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
@@ -373,8 +374,11 @@ public class VuforiaTest extends LinearOpMode {
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
 //                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
                 //telemetry.addData("Turn (deg)" ,"{Heading} = %.0f ", rotation.thirdAngle );
-
-                encoderMovement(10,0,10);
+                waitForStart();
+                encoderMovement(10,90,5);
+                encoderMovement(10,270,5);
+                encoderMovement(10,180,5);
+                targetVisible = false;
 //                telemetry.addData("Movement","{X} = %.lf", translation.get(1));
             }
             else {
@@ -391,6 +395,10 @@ public class VuforiaTest extends LinearOpMode {
 
     public void encoderMovement(double distance, double angleHeading,
                                 double timeoutS) {
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         double angleHeadingDegrees = angleHeading;
         angleHeading = Math.toRadians(angleHeading);
@@ -432,12 +440,14 @@ public class VuforiaTest extends LinearOpMode {
                     backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
                     backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
                 }else if(angleHeading>180){
-                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
-                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
-                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
-                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    telemetry.addData("Angle is more than 180!!!!!!!!!!", "");
+                    telemetry.update();
+                    sleep(5000);
+                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist)*-1;
+                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist)*-1;
+                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist)*-1;
+                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist)*-1;
                 }else {
-
                     frontLeftDistance = Math.sqrt((yDist * yDist) + (xDist * xDist));
                     frontRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
                     backLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
@@ -465,10 +475,10 @@ public class VuforiaTest extends LinearOpMode {
 
 
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = leftFrontCurrentPosition +(int)(backRightDistance * COUNTS_PER_INCH);
-            newRightFrontTarget = rightFrontCurrentPositon + (int)(frontRightDistance * COUNTS_PER_INCH);
-            newLeftBackTarget = leftBackCurrentPosition +(int)(backLeftDistance * COUNTS_PER_INCH);
-            newRightBackTarget = rightBackCurrentPosition + (int)(backRightDistance * COUNTS_PER_INCH);
+            newLeftFrontTarget =(int)(backRightDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = (int)(frontRightDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = (int)(backLeftDistance * COUNTS_PER_INCH);
+            newRightBackTarget = (int)(backRightDistance * COUNTS_PER_INCH);
 
             robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
@@ -485,9 +495,9 @@ public class VuforiaTest extends LinearOpMode {
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftFrontMotor.setPower(Math.abs(backLeftPower));
+            robot.leftFrontMotor.setPower(Math.abs(frontLeftPower+0.15));
             robot.rightFrontMotor.setPower(Math.abs(frontRightPower));
-            robot.leftBackMotor.setPower(Math.abs(backLeftPower));
+            robot.leftBackMotor.setPower(Math.abs(backLeftPower+0.15));
             robot.rightBackMotor.setPower(Math.abs(backRightPower));
 
 
@@ -531,6 +541,7 @@ public class VuforiaTest extends LinearOpMode {
             telemetry.addData("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)" , newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
             telemetry.update();
             sleep(5000);   // optional pause after each move
+            System.exit(0);
         }
     }
 }

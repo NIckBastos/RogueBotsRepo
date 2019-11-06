@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -46,6 +47,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Locale;
 
 //import static org.firstinspires.ftc.teamcode.RobotMovement.followCurve;
@@ -76,7 +79,7 @@ import java.util.Locale;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Disabled
+
 @Autonomous(name="AutonomousBase", group="Pushbot")
 //@Disabled
 public class AutonomousBase extends LinearOpMode {
@@ -92,14 +95,18 @@ public class AutonomousBase extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
 
-    private static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    private static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
+    private static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+    private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.3;
-    static final double     TURN_SPEED              = 0.3;
-    static final double     Lift_Speed              = 0.4;
+    static final double DRIVE_SPEED = 0.3;
+    static final double TURN_SPEED = 0.3;
+    static final double Lift_Speed = 0.4;
+    int leftFrontCurrentPosition = 0;
+    int rightFrontCurrentPositon = 0;
+    int leftBackCurrentPosition = 0;
+    int rightBackCurrentPosition = 0;
 
 
     /*
@@ -127,23 +134,26 @@ public class AutonomousBase extends LinearOpMode {
      * Detection engine.
      */
     private TFObjectDetector tfod;
+
     @Override
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+//        robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
         waitForStart();
         //Add code here next year
-
+        encoderMovement(10,90,5);
+        encoderMovement(10,270,5);
 //        encoderDrive(1.0,distanceToTarget/2.54,distanceToTarget/2.54,5);
 
 
     }
+
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
-    String formatDegrees(double degrees){
+    String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 
@@ -161,10 +171,10 @@ public class AutonomousBase extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int)(leftDistance * COUNTS_PER_INCH);
-            newRightFrontTarget = robot.rightFrontMotor.getCurrentPosition() + (int)(rightDistance * COUNTS_PER_INCH);
-            newLeftBackTarget = robot.leftBackMotor.getCurrentPosition() + (int)(leftDistance * COUNTS_PER_INCH);
-            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int)(rightDistance * COUNTS_PER_INCH);
+            newLeftFrontTarget = robot.leftFrontMotor.getCurrentPosition() + (int) (leftDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = robot.rightFrontMotor.getCurrentPosition() + (int) (rightDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = robot.leftBackMotor.getCurrentPosition() + (int) (leftDistance * COUNTS_PER_INCH);
+            newRightBackTarget = robot.rightBackMotor.getCurrentPosition() + (int) (rightDistance * COUNTS_PER_INCH);
 
             robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
             robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
@@ -209,40 +219,184 @@ public class AutonomousBase extends LinearOpMode {
         }
     }
 
+    public void encoderMovement(double distance, double angleHeading,
+                                double timeoutS) {
+        robot.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        double angleHeadingDegrees = angleHeading;
+        angleHeading = Math.toRadians(angleHeading);
 
 
-    public void turn(float degrees) {
-        
-        Orientation angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        float degreesMoved = 0;
-        float direction = Math.signum(degrees);
-        boolean done = false;
-        float lastAngle = angles.firstAngle;
-        while (opModeIsActive() && !done ) {
-            angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData("first angle", angles.firstAngle);
-            telemetry.addData("target", degrees);
+        int newLeftFrontTarget;
+        int newRightFrontTarget;
+        int newLeftBackTarget;
+        int newRightBackTarget;
+
+        double frontLeftDistance = 0;
+        double backLeftDistance = 0;
+        double frontRightDistance = 0;
+        double backRightDistance = 0;
+
+        double frontLeftPower;
+        double frontRightPower;
+        double backLeftPower;
+        double backRightPower;
+
+        double xDist;
+        double yDist;
+
+
+        DecimalFormat rounding = new DecimalFormat("#.###");
+        rounding.setRoundingMode(RoundingMode.CEILING);
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            xDist = distance * Math.cos(angleHeading);
+            yDist = distance * Math.sin(angleHeading);
+
+            if (Math.abs(yDist) >= Math.abs(xDist)) {
+                if (angleHeadingDegrees > 90 && angleHeadingDegrees < 180) {
+                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                } else if (angleHeadingDegrees > 180) {
+                    frontLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist) * -1;
+                    frontRightDistance = Math.sqrt(yDist * yDist + xDist * xDist) * -1;
+                    backLeftDistance = Math.sqrt(yDist * yDist + xDist * xDist) * -1;
+                    backRightDistance = Math.sqrt(yDist * yDist - xDist * xDist) * -1;
+                } else {
+                    frontLeftDistance = Math.sqrt((yDist * yDist) + (xDist * xDist));
+                    frontRightDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    backLeftDistance = Math.sqrt(yDist * yDist - xDist * xDist);
+                    backRightDistance = Math.sqrt(yDist * yDist + xDist * xDist);
+                }
+            } else if (Math.abs(xDist) > Math.abs(yDist)) {
+                if (angleHeadingDegrees > 90) {
+                    frontLeftDistance = Math.sqrt(xDist * xDist + yDist * yDist) * -1;
+                    frontRightDistance = Math.sqrt(xDist * xDist - yDist * yDist);
+                    backLeftDistance = Math.sqrt(xDist * xDist - yDist * yDist);
+                    backRightDistance = Math.sqrt(xDist * xDist + yDist * yDist) * -1;
+                } else if (angleHeadingDegrees < 90) {
+                    frontLeftDistance = Math.sqrt(xDist * xDist + yDist * yDist);
+                    frontRightDistance = Math.sqrt(xDist * xDist - yDist * yDist) * -1;
+                    backLeftDistance = Math.sqrt(xDist * xDist - yDist * yDist) * -1;
+                    backRightDistance = Math.sqrt(xDist * xDist + yDist * yDist);
+                }
+
+            }
+
+            frontLeftPower = Double.parseDouble(rounding.format((frontLeftDistance / distance)));
+            frontRightPower = Double.parseDouble(rounding.format((frontRightDistance / distance)));
+            backLeftPower = Double.parseDouble(rounding.format((backLeftDistance / distance)));
+            backRightPower = Double.parseDouble(rounding.format((backRightDistance / distance)));
+
+
+            // Determine new target position, and pass to motor controller
+            newLeftFrontTarget = (int) (backRightDistance * COUNTS_PER_INCH);
+            newRightFrontTarget = (int) (frontRightDistance * COUNTS_PER_INCH);
+            newLeftBackTarget = (int) (backLeftDistance * COUNTS_PER_INCH);
+            newRightBackTarget = (int) (backRightDistance * COUNTS_PER_INCH);
+
+            robot.leftFrontMotor.setTargetPosition(newLeftFrontTarget);
+            robot.rightFrontMotor.setTargetPosition(newRightFrontTarget);
+            robot.leftBackMotor.setTargetPosition(newLeftBackTarget);
+            robot.rightBackMotor.setTargetPosition(newRightBackTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.leftFrontMotor.setPower(frontLeftPower*0.6
+
+
+            );
+            robot.rightFrontMotor.setPower(frontRightPower*0.6);
+            robot.leftBackMotor.setPower(backLeftPower*0.6);
+            robot.rightBackMotor.setPower(backRightPower*0.6);
+
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() && (robot.leftFrontMotor.isBusy() || robot.rightFrontMotor.isBusy() || robot.leftBackMotor.isBusy() || robot.rightBackMotor.isBusy())) {
+                telemetry.addData("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower(), robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+                telemetry.addData("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)", robot.leftBackMotor.getPower(), robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+                telemetry.addData("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)", newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
+                RobotLog.d("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower(), robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+                RobotLog.d("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)", robot.leftBackMotor.getPower(), robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+                RobotLog.d("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)", newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
+                telemetry.update();
+            }
+
+            leftFrontCurrentPosition = newLeftFrontTarget;
+            leftBackCurrentPosition = newLeftBackTarget;
+            rightBackCurrentPosition = newRightBackTarget;
+            rightFrontCurrentPositon = newRightFrontTarget;
+
+            // Stop all motion;
+            robot.leftFrontMotor.setPower(0);
+            robot.rightFrontMotor.setPower(0);
+            robot.leftBackMotor.setPower(0);
+            robot.rightBackMotor.setPower(0);
+            // Turn off RUN_TO_POSITION
+            robot.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            telemetry.addData("Power of left front", "FLP (%.2f", robot.leftFrontMotor.getPower());
+            telemetry.addData("Motor Power, Motor Distance ", "FL (%.2f), FR (%.2f), FLD (%d), FRD (%d)", robot.leftFrontMotor.getPower(), robot.rightFrontMotor.getPower(), robot.leftFrontMotor.getCurrentPosition(), robot.rightFrontMotor.getCurrentPosition());
+            telemetry.addData("Motor Power ", "BLP (%.2f), BRP (%.2f), BLD (%d), BRD (%d)", robot.leftBackMotor.getPower(), robot.rightBackMotor.getPower(), robot.leftBackMotor.getCurrentPosition(), robot.rightBackMotor.getCurrentPosition());
+            telemetry.addData("Motor Power ", "BLT (%d), BRT (%d), FLT (%d), FRT (%d)", newLeftBackTarget, newRightBackTarget, newLeftFrontTarget, newRightFrontTarget);
             telemetry.update();
-            robot.leftFrontMotor.setPower(direction * TURN_SPEED);
-            robot.rightFrontMotor.setPower(-direction * TURN_SPEED);
-            robot.leftBackMotor.setPower(-direction * TURN_SPEED);
-            robot.rightBackMotor.setPower(direction * TURN_SPEED);
-            float currentAngle = angles.firstAngle;
-            if(currentAngle - lastAngle > 90 ){
-                currentAngle -= 360;
-            }else if(currentAngle - lastAngle < -90){
-                currentAngle += 360;
-            }
-            degreesMoved += currentAngle - lastAngle;
-            if(direction < 0){
-                done = degreesMoved < degrees;
-            }else if(direction > 0) {
-                done = degreesMoved > degrees;
-            }
-            lastAngle = currentAngle;
-        }		robot.leftFrontMotor.setPower(0);
-        robot.rightFrontMotor.setPower(Math.abs(0));
-        robot.leftBackMotor.setPower(Math.abs(0));
-        robot.rightBackMotor.setPower(Math.abs(0));
+            sleep(5000);   // optional pause after each move
+        }
     }
 }
+//    public void turn(float degrees) {
+//
+//        Orientation angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//        float degreesMoved = 0;
+//        float direction = Math.signum(degrees);
+//        boolean done = false;
+//        float lastAngle = angles.firstAngle;
+//        while (opModeIsActive() && !done ) {
+//            angles   = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+//            telemetry.addData("first angle", angles.firstAngle);
+//            telemetry.addData("target", degrees);
+//            telemetry.update();
+//            robot.leftFrontMotor.setPower(direction * TURN_SPEED);
+//            robot.rightFrontMotor.setPower(-direction * TURN_SPEED);
+//            robot.leftBackMotor.setPower(-direction * TURN_SPEED);
+//            robot.rightBackMotor.setPower(direction * TURN_SPEED);
+//            float currentAngle = angles.firstAngle;
+//            if(currentAngle - lastAngle > 90 ){
+//                currentAngle -= 360;
+//            }else if(currentAngle - lastAngle < -90){
+//                currentAngle += 360;
+//            }
+//            degreesMoved += currentAngle - lastAngle;
+//            if(direction < 0){
+//                done = degreesMoved < degrees;
+//            }else if(direction > 0) {
+//                done = degreesMoved > degrees;
+//            }
+//            lastAngle = currentAngle;
+//        }		robot.leftFrontMotor.setPower(0);
+//        robot.rightFrontMotor.setPower(Math.abs(0));
+//        robot.leftBackMotor.setPower(Math.abs(0));
+//        robot.rightBackMotor.setPower(Math.abs(0));
+//    }
+//}
