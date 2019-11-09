@@ -112,10 +112,10 @@ public class RogueBot
 
 //    liftMotor = hardwareMap.dcMotor.get("liftMotor");
 //    armMotor = hardwareMap.dcMotor.get("armMotor");
-//    markerServo = hardwareMap.servo.get("MarkerServo");
+
 //    lockMotor = hardwareMap.dcMotor.get("lockMotor");
 //    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-//    leftLiftServo = hardwareMap.servo.get("leftLiftServo");
+
 //    rightLiftServo = hardwareMap.servo.get("rightLiftServo");
     imu = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -150,7 +150,8 @@ public class RogueBot
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+    flipServo_2.setPosition(0);
+    flipServo_1.setPosition(1);
 //    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);

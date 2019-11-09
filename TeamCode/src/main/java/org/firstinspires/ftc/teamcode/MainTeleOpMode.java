@@ -29,6 +29,7 @@ public class MainTeleOpMode extends OpMode {
         (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
+    double speedMultiplier = 0.6;
     double motorMovementMin = 0.0;
     double motorMovementMax = 0.0;
 
@@ -48,7 +49,9 @@ public class MainTeleOpMode extends OpMode {
     public void start() {
         runtime.reset();
     }
+    public void Init() {
 
+    }
 
 
 
@@ -61,21 +64,22 @@ public class MainTeleOpMode extends OpMode {
 
 
         // Joystick Deadband
-        if (Math.abs(drive) < JOYSTICK_DEADBAND) drive = 0;
-        if (Math.abs(strafe) < JOYSTICK_DEADBAND) strafe = 0;
+        if (Math.abs(drive) < JOYSTICK_DEADBAND){ drive = 0;}
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;};
 
 
         //Finding the power to assign for each motor
-        frontLeftPower = drive + strafe + rotate;
+        backRightPower = drive + strafe - rotate;
         backLeftPower = drive - strafe + rotate;
-        frontRightPower = drive + strafe - rotate;
-        backRightPower = drive - strafe - rotate;
+        frontRightPower = drive - strafe - rotate;
+        frontLeftPower = drive + strafe + rotate;
+
 
         // Setting the power to each motor
-        robot.leftFrontMotor.setPower(frontLeftPower);
-        robot.leftBackMotor.setPower(backLeftPower);
-        robot.rightFrontMotor.setPower(frontRightPower);
-        robot.rightBackMotor.setPower(backRightPower);
+        robot.leftFrontMotor.setPower(frontLeftPower*speedMultiplier);
+        robot.leftBackMotor.setPower(backLeftPower*speedMultiplier);
+        robot.rightFrontMotor.setPower(frontRightPower*speedMultiplier);
+        robot.rightBackMotor.setPower(backRightPower*speedMultiplier);
 
 
 
@@ -115,24 +119,27 @@ public class MainTeleOpMode extends OpMode {
         }
 
 
-        if(gamepad2.y){
-            currentAngle = currentAngle + 0.1;
-            robot.flipServo_1.setPosition(currentAngle);
-            robot.flipServo_2.setPosition(-currentAngle);
+
+
+        if(gamepad2.a){
+
+            robot.flipServo_1.setPosition(1);
+            robot.flipServo_2.setPosition(0);
 //            robot.flipServo_1.setPosition(0.5);
 //            robot.flipServo_1.setPosition(-0.5);
 
         } else if(gamepad2.b){
-            currentAngle = currentAngle - 0.1;
-            robot.flipServo_1.setPosition(-currentAngle);
-            robot.flipServo_2.setPosition(currentAngle);
 
-        } else if(gamepad2.a){
-            robot.flipServo_1.setPosition(0.5);
-            robot.flipServo_2.setPosition(0.5);
+            robot.flipServo_1.setPosition(0);
+            robot.flipServo_2.setPosition(1);
         }
 
 
+        if(gamepad1.left_bumper){
+            speedMultiplier = 1;
+        }else{
+            speedMultiplier = 0.6;
+        }
 
 
 
