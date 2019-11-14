@@ -150,8 +150,8 @@ public class RogueBot
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    flipServo_2.setPosition(0);
-    flipServo_1.setPosition(1);
+//    flipServo_2.setPosition(0);
+//    flipServo_1.setPosition(1);
 //    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
