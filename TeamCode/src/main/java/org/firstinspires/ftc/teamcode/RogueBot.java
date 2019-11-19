@@ -110,6 +110,8 @@ public class RogueBot
     flipServo_1 = hardwareMap.servo.get("flipServo_1");
     flipServo_2 = hardwareMap.servo.get("flipServo2");
 
+    
+
 //    liftMotor = hardwareMap.dcMotor.get("liftMotor");
 //    armMotor = hardwareMap.dcMotor.get("armMotor");
 
