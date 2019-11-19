@@ -16,7 +16,7 @@ public class MainTeleOpMode extends OpMode {
     double drive;   // Power for forward and back motion
     double strafe;  // Power for left and right motion
     double rotate;  // Power for rotating the robot
-    double startingAngle =0;
+    double startingAngle =-90;
     double currentAngle = 0;
 
     final private static double JOYSTICK_DEADBAND = 0.1;
@@ -61,8 +61,8 @@ public class MainTeleOpMode extends OpMode {
 
 
         // Joystick Deadband
-        if (Math.abs(drive) < JOYSTICK_DEADBAND) drive = 0;
-        if (Math.abs(strafe) < JOYSTICK_DEADBAND) strafe = 0;
+        if (Math.abs(drive) < JOYSTICK_DEADBAND) {drive = 0;}
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND) {strafe = 0;}
 
 
         //Finding the power to assign for each motor
@@ -116,18 +116,14 @@ public class MainTeleOpMode extends OpMode {
 
 
         if(gamepad2.y){
-            currentAngle+=5;
-            robot.flipServo_1.setPosition(currentAngle);
-            robot.flipServo_2.setPosition(-currentAngle);
+            //currentAngle = currentAngle+5;
+            robot.flipServo_1.setPosition(-90);
+            robot.flipServo_2.setPosition(-90);
 
         } else if(gamepad2.b){
-            currentAngle-=5;
-            robot.flipServo_1.setPosition(-currentAngle);
-            robot.flipServo_2.setPosition(currentAngle);
-
-        } else if(gamepad2.a){
-            robot.flipServo_1.setPosition(startingAngle);
-            robot.flipServo_2.setPosition(startingAngle);
+            //currentAngle = currentAngle-5;
+            robot.flipServo_1.setPosition(-270);
+            robot.flipServo_2.setPosition(270);
         }
 
 
