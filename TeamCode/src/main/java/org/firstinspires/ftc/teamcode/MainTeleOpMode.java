@@ -16,7 +16,7 @@ public class MainTeleOpMode extends OpMode {
     double drive;   // Power for forward and back motion
     double strafe;  // Power for left and right motion
     double rotate;  // Power for rotating the robot
-    double startingAngle =-90;
+    double startingAngle = 0;
     double currentAngle = 0;
 
     final private static double JOYSTICK_DEADBAND = 0.1;
@@ -29,6 +29,7 @@ public class MainTeleOpMode extends OpMode {
         (WHEEL_DIAMETER_INCHES * 3.1415);
 
 
+    double speedMultiplier = 0.6;
     double motorMovementMin = 0.0;
     double motorMovementMax = 0.0;
 
@@ -40,7 +41,6 @@ public class MainTeleOpMode extends OpMode {
 
         robot = new RogueBot();
         robot.init(hardwareMap);
-//        robot.scoopMotor.setTargetPosition(0);
     }
 
     //Code that resets the elapsed time once the driver hits play
@@ -48,7 +48,9 @@ public class MainTeleOpMode extends OpMode {
     public void start() {
         runtime.reset();
     }
+    public void Init() {
 
+    }
 
 
 
@@ -61,38 +63,34 @@ public class MainTeleOpMode extends OpMode {
 
 
         // Joystick Deadband
-        if (Math.abs(drive) < JOYSTICK_DEADBAND) {drive = 0;}
-        if (Math.abs(strafe) < JOYSTICK_DEADBAND) {strafe = 0;}
+        if (Math.abs(drive) < JOYSTICK_DEADBAND){ drive = 0;}
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;};
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;}
 
 
         //Finding the power to assign for each motor
-        frontLeftPower = drive + strafe + rotate;
+        backRightPower = drive + strafe - rotate;
         backLeftPower = drive - strafe + rotate;
-        frontRightPower = drive + strafe - rotate;
-        backRightPower = drive - strafe - rotate;
+        frontRightPower = drive - strafe - rotate;
+        frontLeftPower = drive + strafe + rotate;
+
 
         // Setting the power to each motor
-        robot.leftFrontMotor.setPower(frontLeftPower);
-        robot.leftBackMotor.setPower(backLeftPower);
-        robot.rightFrontMotor.setPower(frontRightPower);
-        robot.rightBackMotor.setPower(backRightPower);
+        robot.leftFrontMotor.setPower(frontLeftPower*speedMultiplier);
+        robot.leftBackMotor.setPower(backLeftPower*speedMultiplier);
+        robot.rightFrontMotor.setPower(frontRightPower*speedMultiplier);
+        robot.rightBackMotor.setPower(backRightPower*speedMultiplier);
 
 
 
 
+        // Setting the power to each motor
+        robot.leftFrontMotor.setPower(frontLeftPower*speedMultiplier);
+        robot.leftBackMotor.setPower(backLeftPower*speedMultiplier);
+        robot.rightFrontMotor.setPower(frontRightPower*speedMultiplier);
+        robot.rightBackMotor.setPower(backRightPower*speedMultiplier);
 
 
-//        // If dpad in gampepad1 is pressed turn the arm
-//        if(!gamepad2.dpad_down && gamepad2.dpad_up){
-//            robot.armMotor.setPower(.7);
-//            robot.armMotor.setTargetPosition(-270);
-//        }else if (gamepad2.dpad_down && !gamepad2.dpad_up){
-//            robot.armMotor.setPower(.7);
-//            robot.armMotor.setTargetPosition(270);
-//
-//        }else{
-//            robot.armMotor.setPower(0);
-//        }
 
 
         //Setting the power of the intake servo to 1 // Intake
@@ -115,18 +113,27 @@ public class MainTeleOpMode extends OpMode {
         }
 
 
-        if(gamepad2.y){
-            //currentAngle = currentAngle+5;
-            robot.flipServo_1.setPosition(-90);
-            robot.flipServo_2.setPosition(-90);
+
+
+        if(gamepad2.a){
+
+            robot.flipServo_1.setPosition(1);
+            robot.flipServo_2.setPosition(0);
+//            robot.flipServo_1.setPosition(0.5);
+//            robot.flipServo_1.setPosition(-0.5);
 
         } else if(gamepad2.b){
-            //currentAngle = currentAngle-5;
-            robot.flipServo_1.setPosition(-270);
-            robot.flipServo_2.setPosition(270);
+
+            robot.flipServo_1.setPosition(0);
+            robot.flipServo_2.setPosition(1);
         }
 
 
+        if(gamepad1.left_bumper){
+            speedMultiplier = 1;
+        }else{
+            speedMultiplier = 0.6;
+        }
 
 
 
@@ -146,6 +153,8 @@ public class MainTeleOpMode extends OpMode {
         // Display flip servo position
         telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());
         telemetry.addData("Servo 2 position", robot.flipServo_2.getPosition());
+        telemetry.addData("Front left motor current position", robot.leftFrontMotor.getCurrentPosition());
+        telemetry.addData("Front right motor current position", robot.rightFrontMotor.getCurrentPosition());
         telemetry.update();
 
     }
