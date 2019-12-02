@@ -69,12 +69,9 @@ public class RogueBot
   public DcMotor leftBackMotor= null;
   public DcMotor rightBackMotor= null;
   public DcMotor rightFrontMotor= null;
-  public CRServo intakeServo_1 = null;
-  public CRServo intakeServo_2 = null;
-  public CRServo intakeServo_3 = null;
-  public CRServo intakeServo_4 = null;
-  public Servo flipServo_1 = null;
-  public Servo flipServo_2 = null;
+  public Servo hookServo_1 = null;
+  public Servo hookServo_2 = null;
+  public Servo rotateServo = null;
 
 //  public DcMotor liftMotor= null;
 //  public DcMotor armMotor= null;
@@ -103,12 +100,11 @@ public class RogueBot
     rightBackMotor = hardwareMap.dcMotor.get("backRight");
     rightFrontMotor = hardwareMap.dcMotor.get("frontRight");
 
-    intakeServo_1 = hardwareMap.crservo.get("intakeServo1");
-    intakeServo_2 = hardwareMap.crservo.get("intakeServo2");
-    intakeServo_3 = hardwareMap.crservo.get("intakeServo3");
-    intakeServo_4 = hardwareMap.crservo.get("intakeServo4");
-    flipServo_1 = hardwareMap.servo.get("flipServo_1");
-    flipServo_2 = hardwareMap.servo.get("flipServo2");
+    hookServo_1 = hardwareMap.servo.get("hookServo1");
+    hookServo_2 = hardwareMap.servo.get("hookServo2");
+
+    rotateServo = hardwareMap.servo.get("rotateServo");
+
 
 
 

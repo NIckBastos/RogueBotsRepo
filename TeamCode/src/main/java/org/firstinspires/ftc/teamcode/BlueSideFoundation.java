@@ -145,10 +145,10 @@ public class BlueSideFoundation extends LinearOpMode {
 //        encoderMovement(75,149,3);
         encoderMovement(35,180,3);
         encoderMovement(59,90,3);
-        extendArm(true);
+        //extendArm(true);
         sleep(1000);
         encoderMovement(70,270,2);
-        extendArm(false);
+        //extendArm(false);
         sleep(100);
         encoderMovement(120,0,4);
     }
@@ -295,19 +295,19 @@ public class BlueSideFoundation extends LinearOpMode {
             sleep(500);   // optional pause after each move
         }
     }
-    public void extendArm(boolean state){
-        if(state){
-            robot.flipServo_1.setPosition(0);
-            robot.flipServo_2.setPosition(1);
-            telemetry.addData("Open",' ');
-            telemetry.update();
-            sleep(500);
-        }else {
-            robot.flipServo_1.setPosition(.8);
-            robot.flipServo_2.setPosition(.3);
-            telemetry.addData("Close",' ');
-            telemetry.update();
-            sleep(500);
-        }
-    }
+//    public void extendArm(boolean state){
+//        if(state){
+//            robot.flipServo_1.setPosition(0);
+//            robot.flipServo_2.setPosition(1);
+//            telemetry.addData("Open",' ');
+//            telemetry.update();
+//            sleep(500);
+//        }else {
+//            robot.flipServo_1.setPosition(.8);
+//            robot.flipServo_2.setPosition(.3);
+//            telemetry.addData("Close",' ');
+//            telemetry.update();
+//            sleep(500);
+//        }
+//    }
 }

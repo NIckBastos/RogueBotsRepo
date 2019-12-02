@@ -292,19 +292,5 @@ public class RedSideBlocks extends LinearOpMode {
             sleep(500);   // optional pause after each move
         }
     }
-    public void extendArm(boolean state){
-        if(state){
-            robot.flipServo_1.setPosition(0);
-            robot.flipServo_2.setPosition(1);
-            telemetry.addData("Open",' ');
-            telemetry.update();
-            sleep(500);
-        }else {
-            robot.flipServo_1.setPosition(.8);
-            robot.flipServo_2.setPosition(.3);
-            telemetry.addData("Close",' ');
-            telemetry.update();
-            sleep(500);
-        }
-    }
+
 }
