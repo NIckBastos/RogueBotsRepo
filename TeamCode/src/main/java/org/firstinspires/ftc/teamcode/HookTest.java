@@ -140,9 +140,16 @@ public class HookTest extends LinearOpMode {
 
         robot.init(hardwareMap);
         waitForStart();
+
+        // This should deploy the intake
+        encoderLift(0.6,4,2);
         rotateServo();
+        encoderLift(0.6,-4,2);
+
+        // This will latch to the foundation
         hookDown();
         hookUp();
+
 
     }
 
@@ -151,20 +158,15 @@ public class HookTest extends LinearOpMode {
         robot.hookServo_1.setPosition(1);//up
         robot.hookServo_2.setPosition(-1);//up
 
-
-
         sleep(1000);
         telemetry.addData("down",' ');
         telemetry.update();
-
-
     }
 
     public void hookUp(){
         robot.hookServo_1.setPosition(-1);//up
         robot.hookServo_2.setPosition(1);//up
-
-
+        
         telemetry.addData("up",' ');
         telemetry.update();
         sleep(1000);
@@ -180,4 +182,58 @@ public class HookTest extends LinearOpMode {
         telemetry.addData("rotate","");
         sleep(1000);
     }
+
+    public void encoderLift(double speed, double height, double timeoutS){
+        int newLeftTarget;
+        int newRightTarget;
+
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Reset Encoders
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = robot.liftMotorLeft.getCurrentPosition() + (int)(height * COUNTS_PER_INCH);
+            newRightTarget = robot.liftMotorRight.getCurrentPosition() + (int)(height*COUNTS_PER_INCH);
+
+            // Assign new raget position
+            robot.liftMotorLeft.setTargetPosition(newLeftTarget);
+            robot.liftMotorRight.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.liftMotorLeft.setPower(Math.abs(speed));
+            robot.liftMotorRight.setPower(Math.abs(speed));
+
+
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.liftMotorLeft.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.liftMotorLeft.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.liftMotorLeft.setPower(0);
+            robot.liftMotorRight.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        }
+    }
+
+
 }

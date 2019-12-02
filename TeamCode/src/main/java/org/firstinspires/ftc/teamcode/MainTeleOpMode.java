@@ -64,7 +64,7 @@ public class MainTeleOpMode extends OpMode {
 
         // Joystick Deadband
         if (Math.abs(drive) < JOYSTICK_DEADBAND){ drive = 0;}
-        if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;};
+        if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;}
         if (Math.abs(strafe) < JOYSTICK_DEADBAND){ strafe = 0;}
 
 
@@ -93,49 +93,32 @@ public class MainTeleOpMode extends OpMode {
 
 
 
-        //Setting the power of the intake servo to 1 // Intake
-//        if (gamepad2.right_bumper) {
-//            robot.intakeServo_2.setPower(1);
-//            robot.intakeServo_1.setPower(-1);
-//            robot.intakeServo_3.setPower(1);
-//            robot.intakeServo_4.setPower(-1);
-//
-//        } else if (gamepad2.left_bumper) { // Setting the power of the intake servo to -1 // Output
-//            robot.intakeServo_2.setPower(-1);
-//            robot.intakeServo_1.setPower(1);
-//            robot.intakeServo_3.setPower(-1);
-//            robot.intakeServo_4.setPower(1);
-//        }else{ // Setting the power of the intake servo to 0 // Zero behaviour
-//            robot.intakeServo_1.setPower(0);
-//            robot.intakeServo_2.setPower(-0.05);
-//            robot.intakeServo_3.setPower(0);
-//            robot.intakeServo_4.setPower(0);
-//        }
 
 
 
 
+        // Open intake
         if(gamepad2.a){
-
-//            robot.flipServo_1.setPosition(1);
-//            robot.flipServo_2.setPosition(0);
-//            robot.flipServo_1.setPosition(0.5);
-//            robot.flipServo_1.setPosition(-0.5);
-
-        } else if(gamepad2.b){
-
-//            robot.flipServo_1.setPosition(0);
-//            robot.flipServo_2.setPosition(1);
+            robot.intakeServo.setPosition(1);
+            robot.intakeServo.setPosition(0);
+        } else if(gamepad2.b){ // Close intake
+            robot.intakeServo.setPosition(0);
+            robot.intakeServo.setPosition(1);
         }
 
 
-        if(gamepad1.left_bumper){
+        // Change the speedMultiplier for fast mode and reverse
+        // Reverse mode is in testing and might not work
+        // Reverse mode will switch the front of the robot to be the back
+        if(gamepad1.right_bumper && gamepad1.left_bumper){
+            speedMultiplier = -1;
+        }else if(gamepad1.left_bumper){
             speedMultiplier = 1;
+        }else if (gamepad1.right_bumper){
+            speedMultiplier = -0.6;
         }else{
             speedMultiplier = 0.6;
         }
-
-
 
 
 
@@ -151,8 +134,8 @@ public class MainTeleOpMode extends OpMode {
 
 
         // Display flip servo position
-//        telemetry.addData("Servo 1 position" , robot.flipServo_1.getPosition());
-//        telemetry.addData("Servo 2 position", robot.flipServo_2.getPosition());
+        telemetry.addData("Servo 1 position" , robot.intakeServo.getPosition());
+        telemetry.addData("Servo 2 position", robot.intakeServo.getPosition());
         telemetry.addData("Front left motor current position", robot.leftFrontMotor.getCurrentPosition());
         telemetry.addData("Front right motor current position", robot.rightFrontMotor.getCurrentPosition());
         telemetry.update();

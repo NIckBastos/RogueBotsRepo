@@ -72,6 +72,9 @@ public class RogueBot
   public Servo hookServo_1 = null;
   public Servo hookServo_2 = null;
   public Servo rotateServo = null;
+  public Servo intakeServo = null;
+  public DcMotor liftMotorRight = null;
+  public DcMotor liftMotorLeft = null;
 
 //  public DcMotor liftMotor= null;
 //  public DcMotor armMotor= null;
@@ -100,21 +103,16 @@ public class RogueBot
     rightBackMotor = hardwareMap.dcMotor.get("backRight");
     rightFrontMotor = hardwareMap.dcMotor.get("frontRight");
 
+    liftMotorRight = hardwareMap.dcMotor.get("liftMotorRight");
+    liftMotorLeft = hardwareMap.dcMotor.get("liftMotorLeft");
+
     hookServo_1 = hardwareMap.servo.get("hookServo1");
     hookServo_2 = hardwareMap.servo.get("hookServo2");
 
     rotateServo = hardwareMap.servo.get("rotateServo");
+    intakeServo = hardwareMap.servo.get("intakeServo");
 
 
-
-
-//    liftMotor = hardwareMap.dcMotor.get("liftMotor");
-//    armMotor = hardwareMap.dcMotor.get("armMotor");
-
-//    lockMotor = hardwareMap.dcMotor.get("lockMotor");
-//    intakeMotor = hardwareMap.dcMotor.get("intakeMotor");
-
-//    rightLiftServo = hardwareMap.servo.get("rightLiftServo");
     imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
@@ -148,16 +146,10 @@ public class RogueBot
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//    flipServo_2.setPosition(0);
-//    flipServo_1.setPosition(1);
-//    liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//    intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//    lockMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-//    lockMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-//    lockMotor.setMode(RunMode.RUN_TO_POSITION);
-//    armMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-//    armMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-//    armMotor.setMode(RunMode.RUN_TO_POSITION);
+
+    liftMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    liftMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
 
 
