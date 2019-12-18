@@ -33,6 +33,7 @@ import java.util.List;
  * monitor: 640 x 480
  *YES
  */
+//
 @Autonomous(name= "opencvSkystoneDetector", group="Sky autonomous")
 @Disabled//comment out this line before using
 public class opencvSkystoneDetector extends LinearOpMode {
