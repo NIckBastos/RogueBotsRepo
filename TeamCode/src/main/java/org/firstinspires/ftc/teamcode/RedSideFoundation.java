@@ -144,17 +144,52 @@ public class RedSideFoundation extends LinearOpMode {
 
         robot.init(hardwareMap);
         waitForStart();
-        //0.52cm per 'distance"
-        //127 cm (50in) is 244 'distance'
-        encoderMovement(75,49,2);
-        encoderMovement(11,90,2);
-        encoderMovement(13,0,2);
-        //extendArm(true);
+//        //0.52cm per 'distance"
+//        //127 cm (50in) is 244 'distance'
+//        encoderMovement(75,49,2);
+//        encoderMovement(11,90,2);
+//        encoderMovement(13,0,2);
+//        //extendArm(true);
+//        sleep(1000);
+//        encoderMovement(69,270,2);
+//        //extendArm(false);
+//        sleep(100);
+//        encoderMovement(130,180,2);
+
+        // Strafe left
+        encoderMovement(35,180,3);
+        // Move forwards
+        encoderMovement(58,270,3);
+
+        // Lower hook
+        hookDown();
+
         sleep(1000);
-        encoderMovement(69,270,2);
-        //extendArm(false);
+
+        // Move backwards
+        encoderMovement(80,90,2);
+        sleep(1000);
+        // Detach from foundation
+        hookUp();
         sleep(100);
-        encoderMovement(130,180,2);
+
+
+        // Strafe Right
+        encoderMovement(70,0,4);
+
+        encoderMovement(10, 270,1);
+
+        turn(-84);
+
+        //encoderMovement(10,0,1);
+        encoderMovement(50,270,1.5);
+
+        sleep(1000);
+
+//        encoderLift(3,2);
+//        rotateServo();
+//        setUpIntake();
+//        encoderLift(-3, 2);
     }
 
     public void encoderMovement(double cm, double angleHeading,
@@ -299,19 +334,133 @@ public class RedSideFoundation extends LinearOpMode {
             sleep(500);   // optional pause after each move
         }
     }
-//    public void extendArm(boolean state){
-//        if(state){
-//            robot.flipServo_1.setPosition(0);
-//            robot.flipServo_2.setPosition(1);
-//            telemetry.addData("Open",' ');
-//            telemetry.update();
-//            sleep(500);
-//        }else {
-//            robot.flipServo_1.setPosition(.8);
-//            robot.flipServo_2.setPosition(.3);
-//            telemetry.addData("Close",' ');
-//            telemetry.update();
-//            sleep(500);
-//        }
-//    }
+    public void hookDown(){
+        robot.hookServo_1.setPower(1);//up
+        robot.hookServo_2.setPower(-1);//up
+
+        sleep(1000);
+        telemetry.addData("down",' ');
+        telemetry.update();
+    }
+
+    public void hookUp(){
+        robot.hookServo_1.setPower(-1);//up
+        robot.hookServo_2.setPower(1);//up
+
+        telemetry.addData("up",' ');
+        telemetry.update();
+        sleep(1000);
+
+        robot.hookServo_1.setPower(0);//up
+        robot.hookServo_2.setPower(0);//up
+        telemetry.addData("up",' ');
+        telemetry.update();
+    }
+    public void rotateServo(){
+        robot.rotateServo.setPosition(0.25);
+        telemetry.addData("rotate","");
+        sleep(1000);
+    }
+
+    public void turn(float degrees){
+        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        float degreesMoved = 0;
+        float direction = Math.signum(degrees);
+        boolean done = false;
+        float lastAngle = angles.firstAngle;
+        while(opModeIsActive() && !done){
+
+            angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("first angle", angles.firstAngle);
+            telemetry.addData("target", degrees);
+            telemetry.addData("Done, fuck meeee i wannna dieeeee", done);
+            telemetry.update();
+
+            robot.leftFrontMotor.setPower(direction*TURN_SPEED);
+            robot.rightFrontMotor.setPower(-1*direction*TURN_SPEED);
+            robot.leftBackMotor.setPower(direction*TURN_SPEED);
+            robot.rightBackMotor.setPower(-1*direction*TURN_SPEED);
+
+            float currentAngle = angles.firstAngle;
+            if(currentAngle - lastAngle > 90){
+                currentAngle -= 360;
+            }else if(currentAngle - lastAngle < -90){
+                currentAngle+= 360;
+            }
+            degreesMoved += currentAngle - lastAngle;
+            if(direction<0){
+                done = degreesMoved < degrees;
+
+            }else if(direction > 0){
+                done = degreesMoved > degrees;
+            }
+
+
+            if(Math.abs(currentAngle) >=  Math.abs(degrees)){
+                done = true;
+
+            }
+
+            lastAngle = currentAngle;
+
+        }
+
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftBackMotor.setPower(0);
+        robot.rightBackMotor.setPower(0);
+    }
+
+    public void encoderLift(double height, double timeoutS){
+        int newLeftTarget;
+        int newRightTarget;
+
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Reset Encoders
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            // Determine new target position, and pass to motor controller
+            newLeftTarget = robot.liftMotorLeft.getCurrentPosition() + (int)(height * COUNTS_PER_INCH);
+            newRightTarget = robot.liftMotorRight.getCurrentPosition() + (int)(height*COUNTS_PER_INCH)*-1;
+
+            // Assign new raget position
+            robot.liftMotorLeft.setTargetPosition(newLeftTarget);
+            robot.liftMotorRight.setTargetPosition(newRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.liftMotorLeft.setPower(Math.abs(Lift_Speed));
+            robot.liftMotorRight.setPower(Math.abs(Lift_Speed));
+
+
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.liftMotorLeft.isBusy())) {
+
+
+                // Display it for the driver.
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.liftMotorLeft.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.liftMotorLeft.setPower(0);
+            robot.liftMotorRight.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.liftMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.liftMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        }
+    }
 }

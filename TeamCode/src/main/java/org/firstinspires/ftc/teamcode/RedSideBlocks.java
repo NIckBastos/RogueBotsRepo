@@ -146,8 +146,9 @@ public class RedSideBlocks extends LinearOpMode {
         waitForStart();
         //0.52cm per 'distance"
         //127 cm (50in) is 244 'distance'
-        encoderMovement(48,90,2);
-        encoderMovement(85,0,2);
+        encoderMovement(49,90,2);
+        turn(-78);
+        encoderMovement(79,270,2);
     }
 
     public void encoderMovement(double cm, double angleHeading,
@@ -291,6 +292,54 @@ public class RedSideBlocks extends LinearOpMode {
             telemetry.update();
             sleep(500);   // optional pause after each move
         }
+    }
+    public void turn(float degrees){
+        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        float degreesMoved = 0;
+        float direction = Math.signum(degrees);
+        boolean done = false;
+        float lastAngle = angles.firstAngle;
+        while(opModeIsActive() && !done){
+
+            angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("first angle", angles.firstAngle);
+            telemetry.addData("target", degrees);
+            telemetry.addData("Done, fuck meeee i wannna dieeeee", done);
+            telemetry.update();
+
+            robot.leftFrontMotor.setPower(direction*TURN_SPEED);
+            robot.rightFrontMotor.setPower(-1*direction*TURN_SPEED);
+            robot.leftBackMotor.setPower(direction*TURN_SPEED);
+            robot.rightBackMotor.setPower(-1*direction*TURN_SPEED);
+
+            float currentAngle = angles.firstAngle;
+            if(currentAngle - lastAngle > 90){
+                currentAngle -= 360;
+            }else if(currentAngle - lastAngle < -90){
+                currentAngle+= 360;
+            }
+            degreesMoved += currentAngle - lastAngle;
+            if(direction<0){
+                done = degreesMoved < degrees;
+
+            }else if(direction > 0){
+                done = degreesMoved > degrees;
+            }
+
+
+            if(Math.abs(currentAngle) >=  Math.abs(degrees)){
+                done = true;
+
+            }
+
+            lastAngle = currentAngle;
+
+        }
+
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftBackMotor.setPower(0);
+        robot.rightBackMotor.setPower(0);
     }
 
 }

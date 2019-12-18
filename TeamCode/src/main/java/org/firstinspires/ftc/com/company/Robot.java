@@ -3,7 +3,7 @@ package org.firstinspires.ftc.com.company;
 import org.firstinspires.ftc.RobotUtilities.MovementVars;
 import org.firstinspires.ftc.RobotUtilities.SpeedOmeter;
 
-import static org.firstinspires.ftc.teamcode.POI.*;
+import static org.firstinspires.ftc.Assembler.POI.*;
 
 
 public class Robot {

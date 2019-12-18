@@ -100,6 +100,7 @@ public class BlueSideBlocks extends LinearOpMode {
     private static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     private static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
+
     static final double DRIVE_SPEED = 0.3;
     static final double TURN_SPEED = 0.3;
     static final double Lift_Speed = 0.4;
@@ -138,13 +139,15 @@ public class BlueSideBlocks extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+
         robot.init(hardwareMap);
         waitForStart();
         //0.52cm per 'distance"
         //127 cm (50in) is 244 'distance'
 //        encoderMovement(75,149,3);
         encoderMovement(48,90,2);
-        encoderMovement(85,180,2);
+        turn(75);
+        encoderMovement(82,270,2);
     }
     public void encoderMovement(double cm, double angleHeading,
                                 double timeoutS) {
@@ -173,6 +176,7 @@ public class BlueSideBlocks extends LinearOpMode {
         double backRightPower;
 
         double xDist;
+
         double yDist;
         distance = cm/0.52;
 
@@ -287,6 +291,54 @@ public class BlueSideBlocks extends LinearOpMode {
             telemetry.update();
             sleep(500);   // optional pause after each move
         }
+    }
+    public void turn(float degrees){
+        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        float degreesMoved = 0;
+        float direction = Math.signum(degrees);
+        boolean done = false;
+        float lastAngle = angles.firstAngle;
+        while(opModeIsActive() && !done){
+
+            angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("first angle", angles.firstAngle);
+            telemetry.addData("target", degrees);
+            telemetry.addData("Done, fuck meeee i wannna dieeeee", done);
+            telemetry.update();
+
+            robot.leftFrontMotor.setPower(direction*TURN_SPEED);
+            robot.rightFrontMotor.setPower(-1*direction*TURN_SPEED);
+            robot.leftBackMotor.setPower(direction*TURN_SPEED);
+            robot.rightBackMotor.setPower(-1*direction*TURN_SPEED);
+
+            float currentAngle = angles.firstAngle;
+            if(currentAngle - lastAngle > 90){
+                currentAngle -= 360;
+            }else if(currentAngle - lastAngle < -90){
+                currentAngle+= 360;
+            }
+            degreesMoved += currentAngle - lastAngle;
+            if(direction<0){
+                done = degreesMoved < degrees;
+
+            }else if(direction > 0){
+                done = degreesMoved > degrees;
+            }
+
+
+            if(Math.abs(currentAngle) >=  Math.abs(degrees)){
+                done = true;
+
+            }
+
+            lastAngle = currentAngle;
+
+        }
+
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftBackMotor.setPower(0);
+        robot.rightBackMotor.setPower(0);
     }
 
 }

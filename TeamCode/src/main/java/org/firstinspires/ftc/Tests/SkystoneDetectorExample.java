@@ -2,14 +2,19 @@ package org.firstinspires.ftc.Tests;
 
 
 import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.Locale;
+
+
 
 /*
  * Thanks to EasyOpenCV for the great API (and most of the example)
@@ -18,9 +23,12 @@ import java.util.Locale;
  * Derived Work Copyright(c) 2019 DogeDevs
  */
 @TeleOp(name = "Skystone Detector OpMode", group="DogeCV")
-
+//@Disabled
 public class SkystoneDetectorExample extends LinearOpMode {
-    private OpenCvCamera phoneCam;
+
+
+
+    private OpenCvCamera webcam;
     private SkystoneDetector skyStoneDetector;
 
     @Override
@@ -34,7 +42,9 @@ public class SkystoneDetectorExample extends LinearOpMode {
          * single-parameter constructor instead (commented out below)
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webcam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        //phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+
 
         // OR...  Do Not Activate the Camera Monitor View
         //phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK);
@@ -42,7 +52,7 @@ public class SkystoneDetectorExample extends LinearOpMode {
         /*
          * Open the connection to the camera device
          */
-        phoneCam.openCameraDevice();
+        webcam.openCameraDevice();
 
         /*
          * Specify the image processing pipeline we wish to invoke upon receipt
@@ -50,7 +60,7 @@ public class SkystoneDetectorExample extends LinearOpMode {
          * (while a streaming session is in flight) *IS* supported.
          */
         skyStoneDetector = new SkystoneDetector();
-        phoneCam.setPipeline(skyStoneDetector);
+        webcam.setPipeline(skyStoneDetector);
 
         /*
          * Tell the camera to start streaming images to us! Note that you must make sure
@@ -63,7 +73,7 @@ public class SkystoneDetectorExample extends LinearOpMode {
          * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
          * away from the user.
          */
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
         /*
          * Wait for the user to press start on the Driver Station
@@ -77,12 +87,12 @@ public class SkystoneDetectorExample extends LinearOpMode {
              */
             telemetry.addData("Stone Position X", skyStoneDetector.getScreenPosition().x);
             telemetry.addData("Stone Position Y", skyStoneDetector.getScreenPosition().y);
-            telemetry.addData("Frame Count", phoneCam.getFrameCount());
-            telemetry.addData("FPS", String.format(Locale.US, "%.2f", phoneCam.getFps()));
-            telemetry.addData("Total frame time ms", phoneCam.getTotalFrameTimeMs());
-            telemetry.addData("Pipeline time ms", phoneCam.getPipelineTimeMs());
-            telemetry.addData("Overhead time ms", phoneCam.getOverheadTimeMs());
-            telemetry.addData("Theoretical max FPS", phoneCam.getCurrentPipelineMaxFps());
+            telemetry.addData("Frame Count", webcam.getFrameCount());
+            telemetry.addData("FPS", String.format(Locale.US, "%.2f", webcam.getFps()));
+            telemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
+            telemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
+            telemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
+            telemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
             telemetry.update();
 
             /*
@@ -111,7 +121,7 @@ public class SkystoneDetectorExample extends LinearOpMode {
                  * time. Of course, this comment is irrelevant in light of the use case described in
                  * the above "important note".
                  */
-                phoneCam.stopStreaming();
+                webcam.stopStreaming();
                 //webcam.closeCameraDevice();
             }
 
@@ -128,10 +138,10 @@ public class SkystoneDetectorExample extends LinearOpMode {
              * and resume the viewport if the "Y" button on gamepad1 is pressed.
              */
             else if(gamepad1.x) {
-                phoneCam.pauseViewport();
+                webcam.pauseViewport();
             }
             else if(gamepad1.y) {
-                phoneCam.resumeViewport();
+                webcam.resumeViewport();
             }
         }
     }

@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.RobotUtilities;
 
 import static org.firstinspires.ftc.com.company.Robot.worldAngle_rad;
-import static org.firstinspires.ftc.teamcode.MathFunctions.AngleWrap;
-import static org.firstinspires.ftc.teamcode.MathFunctions.AngleWrap;
+import static org.firstinspires.ftc.Assembler.MathFunctions.AngleWrap;
+import static org.firstinspires.ftc.Assembler.MathFunctions.AngleWrap;
 
 public class SpeedOmeter {
     private static long lastUpdateStartTime = 0;

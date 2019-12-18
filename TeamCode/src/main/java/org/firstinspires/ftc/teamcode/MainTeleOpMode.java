@@ -7,7 +7,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "MainTeleOpMode", group = "TeleOp")
 
-public class MainTeleOpMode extends OpMode {
+public class MainTeleOpMode extends OpMode{
+
 
     //Creating variables
     private ElapsedTime runtime = new ElapsedTime();
@@ -30,8 +31,11 @@ public class MainTeleOpMode extends OpMode {
 
 
     double speedMultiplier = 0.6;
-    double motorMovementMin = 0.0;
-    double motorMovementMax = 0.0;
+
+    double liftSpeed = 1.0;
+
+    int maxLiftHeight = 3000;
+
 
 
     private RogueBot robot;
@@ -41,6 +45,10 @@ public class MainTeleOpMode extends OpMode {
 
         robot = new RogueBot();
         robot.init(hardwareMap);
+
+        robot.liftMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.liftMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
     }
 
     //Code that resets the elapsed time once the driver hits play
@@ -55,7 +63,6 @@ public class MainTeleOpMode extends OpMode {
 
 
     public void loop() {
-
         //Finding the value of each joystick
         drive = -gamepad1.left_stick_y;  // Negative because the gamepad is weird
         strafe = gamepad1.left_stick_x;
@@ -91,8 +98,26 @@ public class MainTeleOpMode extends OpMode {
         robot.rightBackMotor.setPower(backRightPower*speedMultiplier);
 
 
+        if(robot.liftMotorRight.getCurrentPosition()<maxLiftHeight){
+            robot.liftMotorRight.setPower(-gamepad2.left_stick_y * liftSpeed);
+            robot.liftMotorLeft.setPower(gamepad2.left_stick_y * liftSpeed);
+        }else{
+            robot.liftMotorRight.setPower(0);
+            robot.liftMotorLeft.setPower(0);
+        }
 
 
+        // Lift down
+//        if(gamepad2.dpad_down){
+//            robot.liftMotorRight.setPower(-0.5);
+//            robot.liftMotorLeft.setPower(0.5);
+//        } else if(gamepad2.dpad_up){ // Lift up
+//            robot.liftMotorRight.setPower(0.5);
+//            robot.liftMotorLeft.setPower(-0.5);
+//        }else{ // Stop lift
+//            robot.liftMotorRight.setPower(0);
+//            robot.liftMotorLeft.setPower(0);
+//        }
 
 
 
@@ -100,10 +125,12 @@ public class MainTeleOpMode extends OpMode {
         // Open intake
         if(gamepad2.a){
             robot.intakeServo.setPosition(1);
-            robot.intakeServo.setPosition(0);
         } else if(gamepad2.b){ // Close intake
-            robot.intakeServo.setPosition(0);
-            robot.intakeServo.setPosition(1);
+            robot.intakeServo.setPosition(0.5);
+        }
+
+        if(gamepad2.y){ // Rotate intake outwards
+            robot.rotateServo.setPosition(0.25);
         }
 
 
@@ -122,6 +149,8 @@ public class MainTeleOpMode extends OpMode {
 
 
 
+
+
         //Telemetry is not used to control the robot, it is purely to help debug by showing
         //Information on the phone
         telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -132,13 +161,9 @@ public class MainTeleOpMode extends OpMode {
         telemetry.addData("Motor Power ", "BL (%.2f), BR (%.2f)" , robot.leftBackMotor.getPower(), robot.leftBackMotor.getPower());
 
 
-
-        // Display flip servo position
-        telemetry.addData("Servo 1 position" , robot.intakeServo.getPosition());
-        telemetry.addData("Servo 2 position", robot.intakeServo.getPosition());
-        telemetry.addData("Front left motor current position", robot.leftFrontMotor.getCurrentPosition());
-        telemetry.addData("Front right motor current position", robot.rightFrontMotor.getCurrentPosition());
+        telemetry.addData("Lift Pos", "Left (%d), Right (%d)", robot.liftMotorLeft.getCurrentPosition(), robot.liftMotorRight.getCurrentPosition());
         telemetry.update();
 
     }
+
 }

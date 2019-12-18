@@ -81,7 +81,7 @@ import java.util.Locale;
  */
 
 @Autonomous(name="HookTest", group="Pushbot")
-//@Disabled
+@Disabled
 public class HookTest extends LinearOpMode {
 
     // The IMU sensor object
@@ -140,23 +140,30 @@ public class HookTest extends LinearOpMode {
 
         robot.init(hardwareMap);
         waitForStart();
+        robot.imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
         // This should deploy the intake
-        encoderLift(0.6,4,2);
-        rotateServo();
-        encoderLift(0.6,-4,2);
+//        encoderLift(1,2,1);
+//        sleep(1000);
+//        rotateServo();
+//        sleep(1000);
+//        encoderLift(0.6,-2,1);
 
         // This will latch to the foundation
-        hookDown();
-        hookUp();
+//        hookDown();
+//        sleep(5000);
+//        hookUp();
+//        sleep(5000);
+
+        turn(90);
 
 
     }
 
 
     public void hookDown(){
-        robot.hookServo_1.setPosition(1);//up
-        robot.hookServo_2.setPosition(-1);//up
+        robot.hookServo_1.setPower(1);//up
+        robot.hookServo_2.setPower(-1);//up
 
         sleep(1000);
         telemetry.addData("down",' ');
@@ -164,21 +171,21 @@ public class HookTest extends LinearOpMode {
     }
 
     public void hookUp(){
-        robot.hookServo_1.setPosition(-1);//up
-        robot.hookServo_2.setPosition(1);//up
-        
+        robot.hookServo_1.setPower(-1);//up
+        robot.hookServo_2.setPower(1);//up
+
         telemetry.addData("up",' ');
         telemetry.update();
         sleep(1000);
 
-        robot.hookServo_1.setPosition(0);//up
-        robot.hookServo_2.setPosition(0);//up
-        telemetry.addData("up",' ');
+        robot.hookServo_1.setPower(0);//up
+        robot.hookServo_2.setPower(0);//up
+        telemetry.addData("zero",' ');
         telemetry.update();
     }
 
     public void rotateServo(){
-        robot.rotateServo.setPosition(-1);
+        robot.rotateServo.setPosition(0.25);
         telemetry.addData("rotate","");
         sleep(1000);
     }
@@ -197,7 +204,7 @@ public class HookTest extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             newLeftTarget = robot.liftMotorLeft.getCurrentPosition() + (int)(height * COUNTS_PER_INCH);
-            newRightTarget = robot.liftMotorRight.getCurrentPosition() + (int)(height*COUNTS_PER_INCH);
+            newRightTarget = robot.liftMotorRight.getCurrentPosition() + (int)(height * COUNTS_PER_INCH);
 
             // Assign new raget position
             robot.liftMotorLeft.setTargetPosition(newLeftTarget);
@@ -216,13 +223,19 @@ public class HookTest extends LinearOpMode {
 
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (robot.liftMotorLeft.isBusy())) {
+                    (robot.liftMotorLeft.isBusy()) && (robot.liftMotorRight.isBusy())) {
+
 
                 // Display it for the driver.
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        robot.liftMotorLeft.getCurrentPosition());
+//                telemetry.addData("Path2",  "Running at %7d :%7d",
+//                        robot.liftMotorLeft.getCurrentPosition());
                 telemetry.update();
             }
+            telemetry.addData("Lift has stopped","");
+            telemetry.update();
+            sleep(1000);
+
+
 
             // Stop all motion;
             robot.liftMotorLeft.setPower(0);
@@ -233,6 +246,55 @@ public class HookTest extends LinearOpMode {
             robot.liftMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         }
+    }
+
+    public void turn(float degrees){
+        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        float degreesMoved = 0;
+        float direction = Math.signum(degrees);
+        boolean done = false;
+        float lastAngle = angles.firstAngle;
+        while(opModeIsActive() && !done){
+
+            angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("first angle", angles.firstAngle);
+            telemetry.addData("target", degrees);
+            telemetry.addData("Done, fuck meeee i wannna dieeeee", done);
+            telemetry.update();
+
+            robot.leftFrontMotor.setPower(direction*TURN_SPEED);
+            robot.rightFrontMotor.setPower(-1*direction*TURN_SPEED);
+            robot.leftBackMotor.setPower(direction*TURN_SPEED);
+            robot.rightBackMotor.setPower(-1*direction*TURN_SPEED);
+
+            float currentAngle = angles.firstAngle;
+            if(currentAngle - lastAngle > 90){
+                currentAngle -= 360;
+            }else if(currentAngle - lastAngle < -90){
+                currentAngle+= 360;
+            }
+            degreesMoved += currentAngle - lastAngle;
+            if(direction<0){
+                done = degreesMoved < degrees;
+
+            }else if(direction > 0){
+                done = degreesMoved > degrees;
+            }
+
+
+            if(Math.abs(currentAngle) >=  Math.abs(degrees)){
+                done = true;
+
+            }
+
+            lastAngle = currentAngle;
+
+        }
+
+        robot.leftFrontMotor.setPower(0);
+        robot.rightFrontMotor.setPower(0);
+        robot.leftBackMotor.setPower(0);
+        robot.rightBackMotor.setPower(0);
     }
 
 

@@ -69,20 +69,14 @@ public class RogueBot
   public DcMotor leftBackMotor= null;
   public DcMotor rightBackMotor= null;
   public DcMotor rightFrontMotor= null;
-  public Servo hookServo_1 = null;
-  public Servo hookServo_2 = null;
+  public CRServo hookServo_1 = null;
+  public CRServo hookServo_2 = null;
   public Servo rotateServo = null;
   public Servo intakeServo = null;
   public DcMotor liftMotorRight = null;
   public DcMotor liftMotorLeft = null;
 
-//  public DcMotor liftMotor= null;
-//  public DcMotor armMotor= null;
-//  public Servo markerServo= null;
-//  public DcMotor lockMotor =null;
-//  public DcMotor intakeMotor =null;
-//  public Servo leftLiftServo = null;
-//  public Servo rightLiftServo = null;
+
   BNO055IMU imu;
 
   /* local OpMode members. */
@@ -98,22 +92,26 @@ public class RogueBot
   public void init(HardwareMap hardwareMap) {
 
     //Assigning variables
+    // Drivebase motors
     leftFrontMotor = hardwareMap.dcMotor.get("frontLeft");
     leftBackMotor = hardwareMap.dcMotor.get("backLeft");
     rightBackMotor = hardwareMap.dcMotor.get("backRight");
     rightFrontMotor = hardwareMap.dcMotor.get("frontRight");
 
+    // Lift motors
     liftMotorRight = hardwareMap.dcMotor.get("liftMotorRight");
     liftMotorLeft = hardwareMap.dcMotor.get("liftMotorLeft");
 
-    hookServo_1 = hardwareMap.servo.get("hookServo1");
-    hookServo_2 = hardwareMap.servo.get("hookServo2");
+    // Foundation servos
+    hookServo_1 = hardwareMap.crservo.get("hookServo1");
+    hookServo_2 = hardwareMap.crservo.get("hookServo2");
 
+    // Intake servos
     rotateServo = hardwareMap.servo.get("rotateServo");
     intakeServo = hardwareMap.servo.get("intakeServo");
 
 
-    imu = hardwareMap.get(BNO055IMU.class, "imu");
+      imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
 
@@ -126,7 +124,7 @@ public class RogueBot
     parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
     parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
     parameters.loggingEnabled      = true;
-    parameters.loggingTag          = "IMU";
+    parameters.loggingTag          = "imu";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
 
